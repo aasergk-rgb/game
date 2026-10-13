@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">エコーラン</string>
+    <string name="title_activity_main">エコーラン</string>
+    <string name="package_name">io.github.aasergkrgb.echorun</string>
+    <string name="custom_url_scheme">io.github.aasergkrgb.echorun</string>
+</resources>

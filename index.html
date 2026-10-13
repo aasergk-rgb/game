@@ -17,9 +17,6 @@
 <meta name="twitter:card" content="summary">
 <title>エコーラン</title>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=IBM+Plex+Mono:wght@500;600&family=M+PLUS+Rounded+1c:wght@500;800&display=swap">
 <style>
 /* Layout: a mobile game shell. Full-screen views (boot, home with bottom tabs, game) stacked in one
    app frame; pause / settings / results / how-to rise as bottom sheets (centered cards on wide screens).
@@ -702,8 +699,13 @@ body.touch .keyhint { display: none; }
 }
 </style>
 <style>
-/* standalone page: keep clear of notches and the home indicator */
-:root { --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px); }
+@font-face { font-family: "Dela Gothic One"; font-weight: 400; font-display: swap; src: url(fonts/dela-gothic-one.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-mono-500.woff2) format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-600.woff2) format("woff2"); }
+@font-face { font-family: "M PLUS Rounded 1c"; font-weight: 500; font-display: swap; src: url(fonts/m-plus-rounded-1c-500.woff2) format("woff2"); }
+@font-face { font-family: "M PLUS Rounded 1c"; font-weight: 800; font-display: swap; src: url(fonts/m-plus-rounded-1c-800.woff2) format("woff2"); }
+/* standalone page and Android app: keep clear of notches, the status bar and the home indicator */
+:root { --safe-t: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)); --safe-b: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)); }
 </style>
 </head>
 <body>
@@ -1099,8 +1101,20 @@ body.touch .keyhint { display: none; }
   }
   const grainPat = ctx.createPattern(grain, 'repeat');
 
+  // the Android app (Capacitor) exposes its native plugins on window.Capacitor.Plugins
+  const NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  const plug = name => (NATIVE && window.Capacitor.Plugins && window.Capacitor.Plugins[name]) || null;
+
   function buzz(ms) {
-    if (!save.settings.haptics || !navigator.vibrate) return;
+    if (!save.settings.haptics) return;
+    const h = plug('Haptics');
+    if (h) {
+      // a pattern alternates on / off times; play each "on" as its own pulse
+      let t = 0;
+      [].concat(ms).forEach((d, i) => { if (i % 2 === 0) setTimeout(() => h.vibrate({ duration: d }).catch(() => {}), t); t += d; });
+      return;
+    }
+    if (!navigator.vibrate) return;
     try { navigator.vibrate(ms); } catch (e) {}
   }
 
@@ -2179,13 +2193,14 @@ body.touch .keyhint { display: none; }
           ${sw('shake', '画面の揺れ')}
           ${sw('flash', 'フラッシュ演出')}
           ${sw('hitbox', '当たり判定を表示')}
-          ${document.fullscreenEnabled ? `<div class="srow"><span>全画面表示</span><button class="textbtn" type="button" data-act="fullscreen">${document.fullscreenElement ? '元にもどす' : '全画面にする'}</button></div>` : ''}
+          ${document.fullscreenEnabled && !NATIVE ? `<div class="srow"><span>全画面表示</span><button class="textbtn" type="button" data-act="fullscreen">${document.fullscreenElement ? '元にもどす' : '全画面にする'}</button></div>` : ''}
         </div>
         <p class="glabel">ヘルプ</p>
         <div class="group">
           <div class="srow"><span>あそびかた<small>ルールとアイテムの説明</small></span><button class="textbtn" type="button" data-act="howto">見る</button></div>
           <div class="srow"><span>チュートリアル<small>操作を一から練習する</small></span><button class="textbtn" type="button" data-act="tutorial">もう一度</button></div>
         </div>
+        ${installRow() ? `<p class="glabel">アプリ</p><div class="group">${installRow()}</div>` : ''}
         <p class="glabel">データ</p>
         <div class="group">
           <div class="srow"><span>記録と実績を消す<small>この端末に保存したデータをすべて消去</small></span><button class="textbtn danger" type="button" data-act="reset" id="resetBtn">消去</button></div>
@@ -2290,12 +2305,12 @@ body.touch .keyhint { display: none; }
     share(o) {
       const full = o.text + '\n' + shareLink();
       const nets = shareNets(o.text);
-      const canCopyImg = !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write);
+      const canCopyImg = !NATIVE && !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write), canShare = !!(navigator.share || plug('Share'));
       return `${sheetHead('シェア', 'close')}
         <div class="share-img-wrap"><img class="share-img" id="shareImg" alt="シェア用の結果画像" hidden><div class="share-img-ph" id="shareImgPh">画像を作成中…</div></div>
         <div class="img-actions">
           <button class="btn3d" type="button" data-act="img-save" disabled>${I.down}画像を保存</button>
-          ${navigator.share ? `<button class="btn3d dark" type="button" data-act="img-share" disabled>${I.share}画像をシェア</button>` : ''}
+          ${canShare ? `<button class="btn3d dark" type="button" data-act="img-share" disabled>${I.share}画像をシェア</button>` : ''}
           ${canCopyImg ? `<button class="btn3d dark" type="button" data-act="img-copy" disabled>${I.copy}<span class="lbl">画像をコピー</span></button>` : ''}
         </div>
         <p class="share-note muted">保存した画像を X や Instagram などに添付して投稿しよう。画像を長押ししても保存できます</p>
@@ -2304,7 +2319,7 @@ body.touch .keyhint { display: none; }
         <div class="share-grid">
           ${nets.map(n => `<a class="sns" href="${n.href}" target="_blank" rel="noopener noreferrer" data-act="share-go" data-net="${n.id}"><span class="sns-ic" style="background:${n.bg};color:${n.fg}">${n.icon}</span>${n.label}</a>`).join('')}
           <button class="sns" type="button" data-act="share-copy" id="shareCopy"><span class="sns-ic" style="background:var(--card-hi);color:var(--chalk)">${I.copy}</span><span class="lbl">コピー</span></button>
-          ${navigator.share ? `<button class="sns" type="button" data-act="share-native"><span class="sns-ic" style="background:var(--card-hi);color:var(--chalk)">${I.share}</span>その他</button>` : ''}
+          ${canShare ? `<button class="sns" type="button" data-act="share-native"><span class="sns-ic" style="background:var(--card-hi);color:var(--chalk)">${I.share}</span>その他</button>` : ''}
         </div>
         <textarea class="sharebox" id="shareBox" readonly hidden aria-label="共有用テキスト">${full}</textarea>
         <p class="share-note muted">アプリが開かないときは「コピー」して貼り付けてください</p>
@@ -2486,7 +2501,15 @@ body.touch .keyhint { display: none; }
       case 'img-save': saveImage(); break;
       case 'img-share': shareImageNative(); break;
       case 'img-copy': copyImage(b); break;
-      case 'share-native': navigator.share({ text: modalOpts.text, url: shareLink() }).then(countShare, () => {}); break;
+      case 'share-native':
+        if (plug('Share')) plug('Share').share({ text: modalOpts.text + '\n' + shareLink(), dialogTitle: 'シェア' }).then(countShare, () => {});
+        else navigator.share({ text: modalOpts.text, url: shareLink() }).then(countShare, () => {});
+        break;
+      case 'install':
+        if (!installEvt) break;
+        installEvt.prompt();
+        installEvt = null; b.closest('.srow').remove();
+        break;
       case 'reset':
         if (Date.now() - resetArmed < 4000) {
           save = defaults(); save.howtoSeen = true; save.tutorialDone = true; save.flags.tutorial = 1; ensureDaily(); persist(); applyVolumes(); applyBodyFlags(); renderProfile(); updateBadges();
@@ -2512,7 +2535,7 @@ body.touch .keyhint { display: none; }
   // ---- sharing ----
   // the published game: its own address when hosted (e.g. GitHub Pages), otherwise the public artifact link
   const PUBLIC_URL = 'https://claude.ai/artifact/MABDxiq7x4ukWfNh8pLHFc';
-  const shareLink = () => (location.protocol === 'https:' && !/claude/.test(location.hostname)) ? location.origin + location.pathname : PUBLIC_URL;
+  const shareLink = () => (!NATIVE && location.protocol === 'https:' && !/claude/.test(location.hostname)) ? location.origin + location.pathname : PUBLIC_URL;
   function shareNets(text) {
     const u = shareLink(), e = encodeURIComponent, full = text + '\n' + u;
     return [
@@ -2629,14 +2652,25 @@ body.touch .keyhint { display: none; }
   let downloads = null;
   try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }, () => {}); } catch (e) {}
   const imageName = () => { const c = modalOpts.card || {}; return `echorun-${c.kind === 'best' ? 'best' : c.mode || 'run'}-${c.score || 0}.png`; };
-  function imageDone(msg) {
+  function imageDone(msg, sub) {
     save.flags.shareImage = 1;
     countShare();
-    if (msg) toast(I.image, msg, '');
+    if (msg) toast(I.image, msg, sub || '');
+  }
+  // the app writes the card to a file: Documents/EchoRun to keep it, the cache to hand it to the share sheet
+  const blobBase64 = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(blob); });
+  async function writeCard(blob, directory, path) {
+    const data = await blobBase64(blob);
+    return (await plug('Filesystem').writeFile({ path, data, directory, recursive: true })).uri;
   }
   function saveImage() {
     const blob = modalOpts.blob;
     if (!blob) return;
+    if (plug('Filesystem')) {
+      // if the public folder is off limits, the share sheet still offers "save"
+      writeCard(blob, 'DOCUMENTS', 'EchoRun/' + imageName()).then(() => imageDone('画像を保存しました', 'ファイル › Documents › EchoRun'), () => shareImageNative());
+      return;
+    }
     if (downloads) {
       downloads.save({ filename: imageName(), data: blob }).then(() => imageDone('画像を保存しました'), err => {
         if (err && (err.code === 'declined' || err.code === 'rate_limited')) return;
@@ -2652,6 +2686,12 @@ body.touch .keyhint { display: none; }
   function shareImageNative() {
     const blob = modalOpts.blob;
     if (!blob) return;
+    if (plug('Share') && plug('Filesystem')) {
+      writeCard(blob, 'CACHE', imageName())
+        .then(uri => plug('Share').share({ files: [uri], text: modalOpts.text + '\n' + shareLink(), dialogTitle: '画像をシェア' }))
+        .then(() => imageDone(), err => { if (!/cancel/i.test(String(err && err.message))) toast(I.image, '画像をシェアできませんでした', ''); });
+      return;
+    }
     const file = new File([blob], imageName(), { type: 'image/png' });
     const data = { files: [file], text: modalOpts.text + '\n' + shareLink() };
     if (navigator.canShare && !navigator.canShare(data)) { toast(I.image, '画像の共有に対応していません', '「画像を保存」してから投稿してください'); return; }
@@ -2683,6 +2723,7 @@ body.touch .keyhint { display: none; }
     const box = $('shareBox'), label = b.querySelector('.lbl');
     const done = () => { label.textContent = 'コピー済み'; b.classList.add('ok'); countShare(); };
     const fallback = () => { box.hidden = false; box.focus(); box.select(); label.textContent = '下を長押し'; try { if (document.execCommand('copy')) done(); } catch (err) {} };
+    if (plug('Clipboard')) { plug('Clipboard').write({ string: box.value }).then(done, fallback); return; }
     try { navigator.clipboard.writeText(box.value).then(done, fallback); } catch (err) { fallback(); }
   }
   sheet.addEventListener('input', e => {
@@ -2729,6 +2770,37 @@ body.touch .keyhint { display: none; }
     if (modalKind === 'pause') { togglePause(); return; }
     if (modalKind === 'result' || modalKind === 'tutdone') { goHome(); return; }
     if (view === 'home' && tab !== 'home') setTab('home');
+  }
+
+  // Android app: the back key walks back like Esc and leaves from the home tab; going to the background pauses
+  if (plug('App')) {
+    const app = plug('App');
+    app.addListener('backButton', () => {
+      if (active()) togglePause();
+      else if (view === 'home' && tab === 'home' && !modalOpen()) app.exitApp();
+      else goBack();
+    });
+    app.addListener('pause', () => { if (active() || state === 'resuming') togglePause(); if (ac) ac.suspend(); });
+    app.addListener('resume', () => { if (ac) ac.resume(); });
+  }
+
+  // web: offline cache and an install button, only on the standalone site (it links a manifest)
+  const PWA = !NATIVE && 'serviceWorker' in navigator && !!document.querySelector('link[rel="manifest"]')
+    && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  let installEvt = null;
+  const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const isIOS = () => /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (PWA) {
+    addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    // the browser keeps its own install banner; the event is kept for the button in settings
+    addEventListener('beforeinstallprompt', e => { installEvt = e; });
+    addEventListener('appinstalled', () => { installEvt = null; toast(I.check, 'インストールしました', 'ホーム画面のアイコンから起動できます'); });
+  }
+  function installRow() {
+    if (!PWA || standalone()) return '';
+    if (installEvt) return `<div class="srow"><span>アプリとしてインストール<small>ホーム画面から全画面で起動、オフラインでも遊べる</small></span><button class="textbtn" type="button" data-act="install">追加</button></div>`;
+    if (isIOS()) return `<div class="srow"><span>ホーム画面に追加<small>Safari の共有ボタン →「ホーム画面に追加」で、アプリのように全画面で遊べる</small></span></div>`;
+    return '';
   }
 
   addEventListener('keydown', e => {

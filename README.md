@@ -4,7 +4,7 @@
 
 前のループで走った自分が「残像」になり、同じ道を往復しつづける。過去の自分をかわしながらループを重ねる、1画面のタイムループ・アクションです。
 
-`index.html` 1ファイルで動きます。ビルドも依存もありません。ブラウザで開けばそのまま遊べます。
+`index.html` 1ファイルで動きます（Web 版はビルド不要）。スマホにインストールできる PWA と、Android アプリ版もあります。
 
 ## モード
 
@@ -78,9 +78,70 @@
 
 操作を助ける仕組み：ダッシュの先行入力、自機まわりのダッシュ回復ゲージと向きの矢印、近くの残像の赤い強調、盤面上端のタイムバー（CHAIN になる3秒の目印つき）。
 
-## ホーム画面に追加（アプリとして起動）
+## アプリとして遊ぶ
 
-GitHub Pages で公開すると、スマホのブラウザで「ホーム画面に追加」できます。アイコンから起動するとアドレスバーなしの全画面で遊べます（`manifest.webmanifest`、`icon.svg`、`icon-192.png`、`icon-512.png`、`apple-touch-icon.png`）。
+### Web 版（PWA）
+
+GitHub Pages で公開した Web 版は PWA（インストールできる Web アプリ）です。
+
+- **インストール**：Android の Chrome などでは、ブラウザのインストール表示か、ゲームの **設定 › アプリ › アプリとしてインストール** から追加できる。iPhone / iPad は Safari の共有ボタン →「ホーム画面に追加」。アイコンから起動すると、アドレスバーのない全画面で遊べる。
+- **オフライン**：一度開けば、ゲーム本体・フォント・アイコンが端末に保存され（`sw.js`）、電波がなくても起動して遊べる。
+- **更新**：オンラインのときは起動時に最新版を取りに行く（3秒以上かかるときは保存済みの版で起動する）。公開のたびに保存済みのデータも入れ替わる。
+- フォントはサイトに同梱している（`fonts/`）。Google Fonts には接続しない。
+
+関係するファイル：`manifest.webmanifest`（名前・アイコン・インストール画面のスクリーンショット）、`sw.js`、`icon-*.png`、`icon-maskable-*.png`、`apple-touch-icon.png`、`screenshots/`。
+
+### Android アプリ
+
+Web 版と同じ `index.html` を [Capacitor](https://capacitorjs.com/) で包んだ Android アプリです（`android/`）。ゲームはすべて端末の中にあり、通信なしで動きます。
+
+アプリ版だけの動き：
+
+- **戻るボタン**：シートを閉じる → タブをホームに戻す → ホームでアプリを閉じる。プレイ中は一時停止。
+- **バックグラウンド**：ホームに戻ったり電話が来たりすると自動で一時停止し、音も止まる。
+- **画像シェア**：「画像を保存」はスマホの `Documents/EchoRun` フォルダに保存。「画像をシェア」「その他」は Android の共有メニュー、「コピー」はクリップボードを使う。
+- **振動**：Android の振動機能を使う（設定でオフにできる）。
+- 画面の向きは縦・横どちらにも対応。ステータスバーやジェスチャーバーにはかぶらない。
+
+#### APK を手に入れる（GitHub Actions）
+
+`index.html` や `android/` を変更して push すると、`.github/workflows/android.yml` が自動でアプリをビルドします。
+
+1. GitHub の **Actions › Android app** で、いちばん上の実行を開く。
+2. 下の **Artifacts** から `echorun-android-…` をダウンロードして展開する。
+3. `echorun-…-debug.apk` をスマホに送ってタップ（「提供元不明のアプリ」のインストールを許可する）。
+
+#### 手元でビルドする
+
+Node.js 22 以上、JDK 21、Android SDK（Android Studio）が必要です。
+
+```sh
+npm ci
+npm run android:debug     # android/app/build/outputs/apk/debug/app-debug.apk ができる
+npm run android:open      # Android Studio で開く（エミュレーターや実機で実行）
+```
+
+`index.html` を変えたら `npm run sync` でアプリ側にコピーします（`www/` は自動で作られる中間フォルダ）。
+
+#### Google Play で公開する
+
+1. 署名用の鍵を作る（**なくすとアプリを更新できなくなる**ので、安全な場所にバックアップする）：
+   ```sh
+   keytool -genkeypair -v -keystore echorun-release.jks -alias echorun -keyalg RSA -keysize 2048 -validity 10000
+   ```
+2. リポジトリの **Settings › Secrets and variables › Actions** に4つ登録する：
+
+   | 名前 | 中身 |
+   | --- | --- |
+   | `ANDROID_KEYSTORE_BASE64` | `base64 -w0 echorun-release.jks` の出力 |
+   | `ANDROID_KEYSTORE_PASSWORD` | 鍵ストアのパスワード |
+   | `ANDROID_KEY_ALIAS` | `echorun` |
+   | `ANDROID_KEY_PASSWORD` | 鍵のパスワード |
+
+3. 次のビルドから、署名済みの `echorun-….aab`（Google Play 用）と `echorun-….apk` も Artifacts に入る。`v1.0.0` のようなタグを push すると、GitHub の Releases にも APK が添付される。
+4. [Google Play Console](https://play.google.com/console) でアプリを作り、`.aab` をアップロードする。バージョン番号（versionCode）は Actions の実行番号で自動的に増える。
+
+アプリ ID は `io.github.aasergkrgb.echorun`（`capacitor.config.json` と `android/app/build.gradle`）。Google Play に一度公開すると変えられないので、変えるなら最初の公開の前に。
 
 ## 設定
 
@@ -88,7 +149,7 @@ GitHub Pages で公開すると、スマホのブラウザで「ホーム画面�
 
 ## 公開（GitHub Pages）
 
-`.github/workflows/pages.yml` で、`main` ブランチへの push 時に GitHub Pages へ自動デプロイします。
+`.github/workflows/pages.yml` で、`main` ブランチへの push 時に Web 版のファイル（Android 用のファイルは除く）を GitHub Pages へ自動デプロイします。
 
 1. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** にする。
 2. このブランチを `main` にマージする（または Actions タブから手動実行）。
@@ -96,6 +157,7 @@ GitHub Pages で公開すると、スマホのブラウザで「ホーム画面�
 
 ## 技術メモ
 
-- 素の HTML / CSS / JavaScript。Canvas 2D 描画、60 ステップ/秒の固定タイムステップ。
+- 素の HTML / CSS / JavaScript。Canvas 2D 描画、60 ステップ/秒の固定タイムステップ。Web 版もアプリ版も同じ `index.html` で動く（アプリでは `window.Capacitor` があるときだけネイティブ機能を使う）。
+- フォントはゲーム内で使う文字だけに絞って同梱（約210KB）。ゲームに新しい文字を足したら `python3 scripts/subset-fonts.py` で作り直す（要 `pip install fonttools brotli`）。
 - BGM と効果音は Web Audio API でその場で合成（音声ファイルなし）。BGM はループ数に応じてテンポと楽器が増える。
 - デイリーの配置は日付とループ番号から作るシード付き乱数で決まるため、プレイヤーの動きに関係なく同じ配置になる。
