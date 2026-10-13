@@ -378,7 +378,9 @@ body {
       for (const g of ghosts) {
         if (g.near > 0) g.near--;
         const gp = ghostAt(g, f), d = Math.hypot(gp[0] - P.x, gp[1] - P.y);
-        if (d < R * 2 * 0.8) {
+        // hit when the bodies overlap past a small forgiveness margin;
+        // near miss only counts when the bodies are visibly apart
+        if (d < R * 2 * 0.9) {
           if (!phasing) { die(g); return; }
           if (!g.phased) {
             g.phased = true; score += 15;
@@ -387,7 +389,7 @@ body {
           }
         } else {
           if (g.phased && d > R * 2.2) g.phased = false;
-          if (!phasing && d < R * 2 + 18 && g.near <= 0) {
+          if (!phasing && d >= R * 2 && d < R * 2 + 18 && g.near <= 0) {
             g.near = 70; score += 25; slow = 8;
             popup(P.x, P.y - 34, 'ニアミス +25', C.chalk, 1);
             sfx.near();
