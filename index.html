@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>エコーラン</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=IBM+Plex+Mono:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap">
+<style>
+/* Layout: one-screen arcade cabinet. HUD strip, square cyanotype (blueprint) arena, control strip. */
+:root {
+  --deep: #0d2546;
+  --cyan: #17407a;
+  --chalk: #eaf1f8;
+  --chalk-dim: #9fb6d3;
+  --line: rgba(234, 241, 248, 0.22);
+  --veil: rgba(13, 37, 70, 0.82);
+  --amber: #ffb627;
+  --coral: #ff6f59;
+  --font-display: "Dela Gothic One", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --font-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html { height: 100%; box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
+body {
+  height: 100%; margin: 0; overflow: hidden;
+  background: var(--deep); color: var(--chalk);
+  font-family: var(--font-body);
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.app {
+  height: 100%; max-width: 820px; margin: 0 auto;
+  padding-inline: 16px; padding-block: 12px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.hud { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--font-display); font-size: 1.45rem; line-height: 1; letter-spacing: 0.04em; }
+.brand small {
+  display: block; margin-top: 5px;
+  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; color: var(--chalk-dim);
+}
+.stats { display: flex; gap: 18px; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.stat { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.stat span { font-size: 0.58rem; letter-spacing: 0.18em; color: var(--chalk-dim); }
+.stat b { font-size: 1.15rem; font-weight: 600; line-height: 1; }
+.stat.score b { color: var(--amber); }
+.stage {
+  position: relative; flex: 1; min-height: 0;
+  display: grid; place-items: center;
+  touch-action: none;
+}
+.board { position: relative; width: 300px; height: 300px; }
+.board canvas {
+  display: block; width: 100%; height: 100%;
+  border-radius: 4px; outline: 1px solid var(--line); outline-offset: 5px;
+}
+.overlay {
+  position: absolute; inset: 0; overflow-y: auto;
+  display: flex; padding: 16px;
+  background: var(--veil);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.card {
+  margin: auto; max-width: 30rem;
+  display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;
+}
+.eyebrow { margin: 0; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.28em; color: var(--chalk-dim); }
+.card h1 {
+  margin: 0; font-family: var(--font-display); font-weight: 400;
+  font-size: clamp(2.6rem, 11vw, 4.4rem); line-height: 1; letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+.card h1 em { font-style: normal; color: var(--amber); }
+.card h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.3rem, 5vw, 1.9rem); line-height: 1.25; text-wrap: balance; }
+.card p { margin: 0; line-height: 1.75; font-size: 0.95rem; }
+.lede { max-width: 26em; }
+.rules {
+  list-style: none; margin: 0; padding: 12px 16px;
+  display: grid; gap: 7px; text-align: left;
+  font-size: 0.84rem; line-height: 1.55; color: var(--chalk-dim);
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.rules b { color: var(--chalk); font-weight: 700; }
+.rules .k-amber { color: var(--amber); }
+.rules .k-coral { color: var(--coral); }
+.result {
+  display: grid; grid-template-columns: repeat(3, auto); gap: 6px 26px;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
+.result span { font-size: 0.6rem; letter-spacing: 0.18em; color: var(--chalk-dim); }
+.result b { font-size: 1.6rem; font-weight: 600; line-height: 1.1; }
+.result .hi { color: var(--amber); }
+.quip { color: var(--chalk-dim); font-size: 0.9rem; max-width: 24em; }
+.newbest { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--deep); background: var(--amber); padding: 3px 10px; border-radius: 3px; }
+.btn {
+  font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.08em;
+  color: var(--deep); background: var(--amber);
+  border: 0; border-radius: 999px; padding: 13px 34px; cursor: pointer;
+  transition: transform 0.12s ease;
+}
+.btn:hover { transform: translateY(-1px) scale(1.03); }
+.btn:active { transform: scale(0.97); }
+.btn:focus-visible, .chip:focus-visible, .dash:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; }
+.small { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--chalk-dim); }
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap; }
+.hint { flex: 1 1 14rem; min-width: 0; margin: 0; font-size: 0.76rem; line-height: 1.5; color: var(--chalk-dim); }
+.hint kbd { font-family: var(--font-mono); font-size: 0.7rem; color: var(--chalk); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.tools { display: flex; align-items: center; gap: 8px; }
+.chip {
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em;
+  color: var(--chalk); background: transparent;
+  border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; cursor: pointer;
+}
+.dash {
+  --cd: 0;
+  font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.1em;
+  color: var(--deep);
+  background: linear-gradient(to top, var(--veil) calc(var(--cd) * 100%), transparent 0), var(--coral);
+  border: 0; border-radius: 999px; padding: 13px 26px; cursor: pointer;
+  touch-action: manipulation;
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hud">
+    <div class="brand">エコーラン<small>TIME-LOOP ARCADE</small></div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span>LOOP</span><b id="sLoop">0</b></div>
+      <div class="stat"><span>残像</span><b id="sGhosts">0</b></div>
+      <div class="stat score"><span>SCORE</span><b id="sScore">0</b></div>
+      <div class="stat"><span>BEST</span><b id="sBest">0</b></div>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="board" id="board"><canvas id="cv" aria-label="ゲーム画面"></canvas></div>
+    <div class="overlay" id="ov"></div>
+  </main>
+
+  <footer class="controls">
+    <p class="hint">移動 <kbd>WASD</kbd> <kbd>矢印</kbd> または画面をドラッグ。ダッシュ <kbd>Space</kbd> または DASH ボタン。<kbd>P</kbd> で一時停止。</p>
+    <div class="tools">
+      <button class="chip" id="muteBtn" type="button">音 ON</button>
+      <button class="chip" id="pauseBtn" type="button">一時停止</button>
+      <button class="dash" id="dashBtn" type="button">DASH</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---- tuning (arena is 1000 x 1000 units, simulation runs at a fixed 60 steps/sec) ----
+  const W = 1000, R = 19;
+  const SPEED = 6.2, DASH_MUL = 3.1, DASH_FRAMES = 9, DASH_CD = 84;
+  const GRACE = 54, LIMIT = 8 * 60, REWIND = 34, STEP = 1000 / 60;
+
+  const $ = id => document.getElementById(id);
+  const cv = $('cv'), ctx = cv.getContext('2d');
+  const stage = $('stage'), board = $('board'), ov = $('ov');
+  const elLoop = $('sLoop'), elGhosts = $('sGhosts'), elScore = $('sScore'), elBest = $('sBest');
+  const dashBtn = $('dashBtn'), muteBtn = $('muteBtn'), pauseBtn = $('pauseBtn');
+
+  const css = getComputedStyle(document.documentElement);
+  const tok = n => css.getPropertyValue(n).trim();
+  const C = { deep: tok('--deep'), cyan: tok('--cyan'), chalk: tok('--chalk'), dim: tok('--chalk-dim'), amber: tok('--amber'), coral: tok('--coral') };
+  const MONO = '"IBM Plex Mono", ui-monospace, monospace';
+  const DISPLAY = '"Dela Gothic One", "Hiragino Sans", sans-serif';
+
+  const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  // canvas text size in arena units, kept readable when the board is small
+  const fs = base => Math.round(Math.max(base, base * 0.55 / px));
+
+  // ---- sizing ----
+  let px = 0.3, dpr = 1;
+  function resize() {
+    const s = Math.max(220, Math.floor(Math.min(stage.clientWidth, stage.clientHeight) - 12));
+    board.style.width = board.style.height = s + 'px';
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = cv.height = Math.round(s * dpr);
+    px = s / W;
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize();
+
+  // paper grain for the cyanotype look
+  const grain = document.createElement('canvas');
+  grain.width = grain.height = 160;
+  {
+    const g = grain.getContext('2d'), im = g.createImageData(160, 160);
+    for (let i = 0; i < im.data.length; i += 4) {
+      const v = Math.random() * 255;
+      im.data[i] = im.data[i + 1] = im.data[i + 2] = v;
+      im.data[i + 3] = Math.random() * 16;
+    }
+    g.putImageData(im, 0, 0);
+  }
+  const grainPat = ctx.createPattern(grain, 'repeat');
+
+  // ---- persistence (per-viewer best score) ----
+  let best = 0;
+  try { best = Number(localStorage.getItem('echorun-best')) || 0; } catch (e) {}
+  const saveBest = () => { try { localStorage.setItem('echorun-best', String(best)); } catch (e) {} };
+
+  // ---- audio ----
+  let ac = null, muted = false;
+  function initAudio() {
+    if (ac) { if (ac.state === 'suspended') ac.resume(); return; }
+    try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ac = null; }
+  }
+  function tone(freq, dur, type, vol, slide, delay) {
+    if (!ac || muted) return;
+    const t = ac.currentTime + (delay || 0);
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'square';
+    o.frequency.setValueAtTime(freq, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(slide, t + dur);
+    g.gain.setValueAtTime(vol || 0.06, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + dur + 0.03);
+  }
+  const sfx = {
+    coin() { tone(988, 0.08, 'square', 0.05); tone(1480, 0.16, 'square', 0.05, 0, 0.07); },
+    near() { tone(1760, 0.05, 'triangle', 0.05); },
+    phase() { tone(620, 0.12, 'triangle', 0.05, 1240); },
+    dash() { tone(260, 0.16, 'sawtooth', 0.03, 820); },
+    rewind() { tone(1100, 0.42, 'sawtooth', 0.025, 110); },
+    erase() { tone(420, 0.3, 'triangle', 0.07, 1600); },
+    tick() { tone(660, 0.04, 'sine', 0.05); },
+    die() { tone(330, 0.6, 'square', 0.06, 45); tone(160, 0.5, 'sawtooth', 0.04, 40, 0.05); },
+  };
+
+  // ---- game state ----
+  // ghosts: every finished loop becomes a recorded path that replays back and forth forever.
+  let state = 'title';            // title | play | rewind | paused | over
+  let pausedFrom = 'play';
+  let ghosts = [], rec = [];
+  let frame = 0, loopN = 0, score = 0, graceLeft = 0, timeLeft = 0;
+  let coin = null, eraser = null, nextStart = null;
+  let rewindT = 0, rewindFrom = 0, overT = 0, overReady = false, killer = null, newBest = false;
+  let banner = null, particles = [], popups = [];
+  let shake = 0, flash = 0, slow = 0, tick = 0;
+  const P = { x: W / 2, y: W / 2, vx: 0, vy: 0, dash: 0, cd: 0, dx: 0, dy: 1, trail: [] };
+
+  function ghostAt(g, f) {
+    const L = g.len;
+    let i = 0;
+    if (L > 1) {
+      const per = 2 * (L - 1), m = f % per;
+      i = m < L ? m : per - m;
+    }
+    return [g.path[i * 3], g.path[i * 3 + 1], g.path[i * 3 + 2]];
+  }
+
+  function makeGhost(data, n) {
+    const path = Float32Array.from(data), len = path.length / 3;
+    const lane = new Path2D();
+    lane.moveTo(path[0], path[1]);
+    for (let i = 2; i < len; i += 2) lane.lineTo(path[i * 3], path[i * 3 + 1]);
+    lane.lineTo(path[(len - 1) * 3], path[(len - 1) * 3 + 1]);
+    return { path, len, n, near: 0, phased: false, lane };
+  }
+
+  function pickSpot(from, minD, avoid) {
+    let bestP = null, bestS = -1;
+    for (let i = 0; i < 80; i++) {
+      const p = { x: rand(90, W - 90), y: rand(90, W - 90) };
+      const d = dist(p, from), a = avoid ? dist(p, avoid) : 999;
+      if (d >= minD && a >= 180) return p;
+      const s = Math.min(d / minD, a / 180);
+      if (s > bestS) { bestS = s; bestP = p; }
+    }
+    return bestP;
+  }
+
+  function start() {
+    initAudio();
+    ghosts = []; loopN = 1; score = 0; newBest = false; killer = null;
+    particles = []; popups = [];
+    ov.hidden = true;
+    beginLoop({ x: W / 2, y: W / 2 });
+  }
+
+  function beginLoop(s) {
+    rec = []; frame = 0;
+    P.x = s.x; P.y = s.y; P.vx = P.vy = 0; P.dash = 0; P.trail = [];
+    coin = pickSpot(s, 360, null);
+    eraser = (loopN % 4 === 0 && ghosts.length >= 3) ? pickSpot(s, 220, coin) : null;
+    graceLeft = GRACE; timeLeft = LIMIT;
+    for (const g of ghosts) { g.near = 0; g.phased = false; }
+    banner = {
+      text: 'LOOP ' + loopN,
+      sub: ghosts.length === 0 ? 'コインを取ろう'
+        : eraser ? '赤い消しゴムで残像をひとつ消せる'
+        : '残像 ×' + ghosts.length,
+      t: 75,
+    };
+    state = 'play';
+    updateHud();
+  }
+
+  function collect() {
+    const secs = Math.ceil(timeLeft / 60), gain = 100 + secs * 10;
+    score += gain;
+    popup(coin.x, coin.y - 36, '+' + gain, C.amber, 1.35);
+    burst(coin.x, coin.y, 28, C.amber, 6);
+    sfx.coin(); sfx.rewind();
+    flash = 0.45;
+    ghosts.push(makeGhost(rec, loopN));
+    nextStart = { x: coin.x, y: coin.y };
+    rewindFrom = frame; rewindT = 0;
+    loopN++;
+    state = 'rewind';
+    updateHud();
+  }
+
+  function doErase() {
+    let idx = 0;
+    ghosts.forEach((g, i) => { if (g.len > ghosts[idx].len) idx = i; });
+    const g = ghosts[idx], p = ghostAt(g, frame);
+    burst(p[0], p[1], 34, C.coral, 7);
+    burst(eraser.x, eraser.y, 14, C.coral, 4);
+    popup(p[0], p[1] - 34, '#' + g.n + ' 消去 +50', C.coral, 1.15);
+    ghosts.splice(idx, 1);
+    score += 50; eraser = null; shake = 9;
+    sfx.erase();
+    updateHud();
+  }
+
+  function die(g) {
+    state = 'over'; overT = 0; overReady = false; killer = g;
+    shake = 24; flash = 0.6;
+    burst(P.x, P.y, 46, C.amber, 8);
+    sfx.die();
+    if (score > best) { best = score; newBest = true; saveBest(); }
+    updateHud();
+  }
+
+  function stepPlay() {
+    const inp = inputVec(), il = Math.hypot(inp.x, inp.y);
+    if (il > 0.1) { P.dx = inp.x / il; P.dy = inp.y / il; }
+    if (dashQueued && P.cd <= 0) {
+      P.dash = DASH_FRAMES; P.cd = DASH_CD;
+      sfx.dash(); burst(P.x, P.y, 10, C.chalk, 3);
+    }
+    dashQueued = false;
+
+    if (P.dash > 0) {
+      P.vx = P.dx * SPEED * DASH_MUL; P.vy = P.dy * SPEED * DASH_MUL; P.dash--;
+    } else {
+      P.vx += (inp.x * SPEED - P.vx) * 0.38;
+      P.vy += (inp.y * SPEED - P.vy) * 0.38;
+    }
+    P.x = clamp(P.x + P.vx, R, W - R);
+    P.y = clamp(P.y + P.vy, R, W - R);
+    if (P.cd > 0) P.cd--;
+    const phasing = P.dash > 0;
+
+    const f = frame;
+    rec.push(P.x, P.y, phasing ? 1 : 0);
+    P.trail.push(P.x, P.y);
+    if (P.trail.length > 30) P.trail.splice(0, 2);
+
+    if (graceLeft <= 0) {
+      for (const g of ghosts) {
+        if (g.near > 0) g.near--;
+        const gp = ghostAt(g, f), d = Math.hypot(gp[0] - P.x, gp[1] - P.y);
+        if (d < R * 2 * 0.8) {
+          if (!phasing) { die(g); return; }
+          if (!g.phased) {
+            g.phased = true; score += 15;
+            popup(P.x, P.y - 34, 'すり抜け +15', C.chalk, 1);
+            sfx.phase();
+          }
+        } else {
+          if (g.phased && d > R * 2.2) g.phased = false;
+          if (!phasing && d < R * 2 + 18 && g.near <= 0) {
+            g.near = 70; score += 25; slow = 8;
+            popup(P.x, P.y - 34, 'ニアミス +25', C.chalk, 1);
+            sfx.near();
+          }
+        }
+      }
+    }
+
+    frame++; graceLeft--; timeLeft--;
+    if (timeLeft > 0 && timeLeft <= 180 && timeLeft % 60 === 0) sfx.tick();
+    if (timeLeft <= 0) { die(null); return; }
+    if (eraser && dist(P, eraser) < R + 22) doErase();
+    if (dist(P, coin) < R + 22) collect();
+  }
+
+  function step() {
+    tick++;
+    if (state === 'paused') return;
+    shake *= 0.86; if (flash > 0) flash -= 0.035;
+    for (const p of particles) { p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92; p.life -= p.decay; }
+    particles = particles.filter(p => p.life > 0);
+    for (const p of popups) { p.t++; p.y -= 0.7; }
+    popups = popups.filter(p => p.t < 64);
+    if (banner && --banner.t <= 0) banner = null;
+
+    if (state === 'play') stepPlay();
+    else if (state === 'rewind') { if (++rewindT >= REWIND) beginLoop(nextStart); }
+    else if (state === 'over') { frame++; if (++overT === 55) showOver(); }
+    else frame++;
+    syncDashBtn();
+  }
+
+  // ---- fx helpers ----
+  function burst(x, y, n, col, spd) {
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, s = spd * (0.25 + Math.random());
+      particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 1, decay: 0.018 + Math.random() * 0.03, col, size: 2 + Math.random() * 4.5 });
+    }
+  }
+  function popup(x, y, text, col, size) { popups.push({ x, y, text, col, size: size || 1, t: 0 }); }
+
+  // ---- input ----
+  const keys = new Set();
+  let dashQueued = false, joy = null;
+  const DASH_KEYS = [' ', 'shift', 'j', 'k', 'x'];
+  const canStart = () => state === 'title' || (state === 'over' && overReady);
+
+  addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k)) e.preventDefault();
+    const onButton = e.target && e.target.tagName === 'BUTTON';
+    keys.add(k);
+    if (e.repeat) return;
+    if (DASH_KEYS.includes(k) && (state === 'play' || state === 'rewind')) dashQueued = true;
+    else if ((k === ' ' || k === 'enter' || k === 'r') && canStart() && !onButton) start();
+    if (k === 'p' || k === 'escape') togglePause();
+  });
+  addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+  addEventListener('blur', () => { keys.clear(); joy = null; if (state === 'play' || state === 'rewind') togglePause(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && (state === 'play' || state === 'rewind')) togglePause(); });
+
+  stage.addEventListener('pointerdown', e => {
+    if (!(state === 'play' || state === 'rewind')) return;
+    if (joy) { dashQueued = true; return; }          // a second finger dashes
+    try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    joy = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: e.clientX, y: e.clientY };
+  });
+  stage.addEventListener('pointermove', e => {
+    if (!joy || e.pointerId !== joy.id) return;
+    joy.x = e.clientX; joy.y = e.clientY;
+    const dx = joy.x - joy.ox, dy = joy.y - joy.oy, d = Math.hypot(dx, dy), full = 46;
+    if (d > full) { joy.ox = joy.x - dx / d * full; joy.oy = joy.y - dy / d * full; } // floating stick
+  });
+  const endJoy = e => { if (joy && e.pointerId === joy.id) joy = null; };
+  stage.addEventListener('pointerup', endJoy);
+  stage.addEventListener('pointercancel', endJoy);
+
+  function inputVec() {
+    let x = 0, y = 0;
+    if (keys.has('arrowleft') || keys.has('a')) x -= 1;
+    if (keys.has('arrowright') || keys.has('d')) x += 1;
+    if (keys.has('arrowup') || keys.has('w')) y -= 1;
+    if (keys.has('arrowdown') || keys.has('s')) y += 1;
+    if (joy) {
+      const dx = joy.x - joy.ox, dy = joy.y - joy.oy, d = Math.hypot(dx, dy), dead = 6, full = 46;
+      if (d > dead) { const m = Math.min(1, (d - dead) / (full - dead)); x += dx / d * m; y += dy / d * m; }
+    }
+    const l = Math.hypot(x, y);
+    if (l > 1) { x /= l; y /= l; }
+    return { x, y };
+  }
+
+  dashBtn.addEventListener('pointerdown', e => { e.stopPropagation(); if (state === 'play' || state === 'rewind') dashQueued = true; });
+  dashBtn.addEventListener('click', e => { if (e.detail === 0 && (state === 'play' || state === 'rewind')) dashQueued = true; });
+  muteBtn.addEventListener('click', () => { muted = !muted; muteBtn.textContent = muted ? '音 OFF' : '音 ON'; });
+  pauseBtn.addEventListener('click', () => togglePause());
+
+  function togglePause() {
+    if (state === 'play' || state === 'rewind') {
+      pausedFrom = state; state = 'paused'; joy = null;
+      ov.innerHTML = '<div class="card"><p class="eyebrow">PAUSED</p><h2>一時停止中</h2>' +
+        '<p class="quip">残像たちも、いまは止まっている。</p>' +
+        '<button class="btn" type="button" id="resumeBtn">つづける</button></div>';
+      ov.hidden = false;
+      $('resumeBtn').addEventListener('click', togglePause);
+      $('resumeBtn').focus();
+      pauseBtn.textContent = '再開';
+    } else if (state === 'paused') {
+      state = pausedFrom; ov.hidden = true; keys.clear();
+      pauseBtn.textContent = '一時停止';
+      initAudio();
+    }
+  }
+
+  // ---- screens ----
+  function showTitle() {
+    ov.innerHTML = `<div class="card">
+      <p class="eyebrow">TIME-LOOP ARCADE</p>
+      <h1>エコー<em>ラン</em></h1>
+      <p class="lede">コインを取ると時間が巻き戻る。さっきまでのあなたは<b>残像</b>になって、同じ道を永遠に往復しつづける。</p>
+      <ul class="rules">
+        <li><b>残像に触れたらアウト。</b>敵はぜんぶ、過去のあなた。</li>
+        <li><b>寄り道するほど、残像の通り道は長くなる。</b>最短ルートで走れ。</li>
+        <li><b>ダッシュ中は残像をすり抜けられる。</b>使ったら少し待つ。</li>
+        <li>ギリギリでかわすと<b>ニアミス</b>ボーナス。制限時間は<b class="k-amber">8秒</b>。</li>
+        <li>4ループごとに出る<b class="k-coral">赤い消しゴム</b>で、いちばん長い残像を消せる。</li>
+      </ul>
+      <button class="btn" type="button" id="startBtn">スタート</button>
+      <span class="small">SPACE / ENTER でも開始</span>
+    </div>`;
+    ov.hidden = false;
+    $('startBtn').addEventListener('click', start);
+  }
+
+  function showOver() {
+    const loops = loopN - 1;
+    let title, quip;
+    if (killer) {
+      const ago = loopN - killer.n;
+      title = (ago === 1 ? 'ひとつ前' : ago + 'ループ前') + 'のあなたに衝突';
+      const quips = [
+        '過去は変えられない。避けるしかない。',
+        `#${killer.n} の動きを決めたのは、ほかでもないあなた自身。`,
+        ago === 1 ? 'ついさっきの自分に追突。いちばん気まずいやつ。' : `${ago}ループ前のあなたは、まだ道を譲ってくれない。`,
+        '残像は手加減しない。あなたがしなかったように。',
+      ];
+      quip = quips[Math.floor(Math.random() * quips.length)];
+    } else {
+      title = '時間切れ';
+      quip = '8秒以内にコインを取ろう。迷っている時間はない。';
+    }
+    ov.innerHTML = `<div class="card">
+      <p class="eyebrow">GAME OVER</p>
+      <h2>${title}</h2>
+      <div class="result">
+        <span>LOOP</span><span>SCORE</span><span>BEST</span>
+        <b>${loops}</b><b class="hi">${score}</b><b>${best}</b>
+      </div>
+      ${newBest ? '<span class="newbest">NEW BEST</span>' : ''}
+      <p class="quip">${quip}</p>
+      <button class="btn" type="button" id="againBtn">もう一度</button>
+      <span class="small">SPACE / ENTER / R でリトライ</span>
+    </div>`;
+    ov.hidden = false;
+    overReady = true;
+    $('againBtn').addEventListener('click', start);
+  }
+
+  let hudCache = '';
+  function updateHud() {
+    const key = loopN + '|' + ghosts.length + '|' + score + '|' + best;
+    if (key === hudCache) return;
+    hudCache = key;
+    elLoop.textContent = loopN;
+    elGhosts.textContent = ghosts.length;
+    elScore.textContent = score;
+    elBest.textContent = best;
+  }
+  let cdCache = -1;
+  function syncDashBtn() {
+    const v = Math.round((P.cd / DASH_CD) * 20) / 20;
+    if (v !== cdCache) { cdCache = v; dashBtn.style.setProperty('--cd', v); }
+    if (state === 'play') updateHud();
+  }
+
+  // ---- drawing ----
+  function drawArena() {
+    const g = ctx.createRadialGradient(500, 430, 80, 500, 520, 780);
+    g.addColorStop(0, C.cyan); g.addColorStop(1, C.deep);
+    ctx.fillStyle = g;
+    ctx.fillRect(-60, -60, W + 120, W + 120);
+    ctx.fillStyle = grainPat;
+    ctx.fillRect(0, 0, W, W);
+
+    ctx.lineWidth = 1 / px;
+    for (let i = 50; i < W; i += 50) {
+      ctx.strokeStyle = i % 250 === 0 ? 'rgba(234,241,248,0.13)' : 'rgba(234,241,248,0.05)';
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, W); ctx.moveTo(0, i); ctx.lineTo(W, i); ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(234,241,248,0.35)';
+    ctx.strokeRect(0, 0, W, W);
+    ctx.fillStyle = 'rgba(234,241,248,0.28)';
+    ctx.font = `500 ${11 / px}px ${MONO}`;
+    ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+    for (let i = 250; i < W; i += 250) ctx.fillText(String(i), i + 4 / px, 4 / px);
+    ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ctx.fillText('ARENA 1000×1000 · 60 STEPS/s', W - 6 / px, W - 5 / px);
+  }
+
+  function drawEyes(x, y, dx, dy, col, r) {
+    const l = Math.hypot(dx, dy);
+    let ex = 0, ey = 0.35;
+    if (l > 0.01) { ex = dx / l; ey = dy / l; }
+    const off = r * 0.36, sp = r * 0.34, er = r * 0.17;
+    ctx.fillStyle = col;
+    for (const s of [-1, 1]) {
+      ctx.beginPath();
+      ctx.arc(x + ex * off - ey * sp * s, y + ey * off + ex * sp * s, er, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawGhost(g, f, live, alphaMul) {
+    const p = ghostAt(g, f), q = ghostAt(g, f + 3);
+    const intangible = live && graceLeft > 0;
+    const isKiller = killer === g && state === 'over';
+    ctx.globalAlpha = (intangible ? 0.4 : 0.92) * alphaMul;
+    if (p[2]) { // dashing: smear
+      ctx.strokeStyle = 'rgba(234,241,248,0.35)'; ctx.lineWidth = R * 1.4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(p[0] - (q[0] - p[0]) * 1.5, p[1] - (q[1] - p[1]) * 1.5); ctx.stroke();
+    }
+    ctx.fillStyle = isKiller ? C.coral : 'rgba(234,241,248,0.2)';
+    ctx.strokeStyle = isKiller ? C.coral : C.chalk;
+    ctx.lineWidth = 2.6;
+    if (intangible) ctx.setLineDash([5, 5]);
+    ctx.beginPath(); ctx.arc(p[0], p[1], R, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.setLineDash([]);
+    drawEyes(p[0], p[1], q[0] - p[0], q[1] - p[1], isKiller ? C.deep : C.chalk, R);
+    ctx.fillStyle = isKiller ? C.coral : C.dim;
+    ctx.font = `600 ${fs(20)}px ${MONO}`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText('#' + g.n, p[0], p[1] - R - 4);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawPreview(g, f) {
+    ctx.fillStyle = C.chalk;
+    for (let k = 1; k <= 12; k++) {
+      const p = ghostAt(g, f + k * 3);
+      ctx.globalAlpha = 0.4 * (1 - k / 13);
+      ctx.beginPath(); ctx.arc(p[0], p[1], 3, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function draw() {
+    const s = px * dpr;
+    let sx = 0, sy = 0;
+    if (shake > 0.4) { sx = (Math.random() - 0.5) * shake; sy = (Math.random() - 0.5) * shake; }
+    ctx.setTransform(s, 0, 0, s, sx * s, sy * s);
+    drawArena();
+
+    const playing = state === 'play' || (state === 'paused' && pausedFrom === 'play');
+    const rewinding = state === 'rewind' || (state === 'paused' && pausedFrom === 'rewind');
+    let gf = frame;
+    if (rewinding) {
+      const p = Math.min(1, rewindT / REWIND), e = p * p * (3 - 2 * p);
+      gf = Math.round(rewindFrom * (1 - e));
+    }
+
+    // lanes: every ghost's full route, so you can read the danger zones
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const g of ghosts) {
+      ctx.strokeStyle = 'rgba(234,241,248,0.045)'; ctx.lineWidth = R * 2; ctx.stroke(g.lane);
+      ctx.strokeStyle = 'rgba(234,241,248,0.14)'; ctx.lineWidth = 1.2 / px; ctx.stroke(g.lane);
+    }
+
+    // coin with the countdown ring
+    if (coin && state !== 'title') {
+      const t = tick / 60, pulse = 1 + Math.sin(t * 6) * 0.08;
+      const frac = state === 'play' || state === 'paused' ? clamp(timeLeft / LIMIT, 0, 1) : 1;
+      const urgent = frac < 3 / 8 && playing;
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'rgba(234,241,248,0.15)';
+      ctx.beginPath(); ctx.arc(coin.x, coin.y, 36, 0, Math.PI * 2); ctx.stroke();
+      if (!(urgent && Math.floor(tick / 8) % 2)) {
+        ctx.strokeStyle = urgent ? C.coral : C.amber;
+        ctx.beginPath(); ctx.arc(coin.x, coin.y, 36, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac); ctx.stroke();
+      }
+      ctx.save();
+      ctx.translate(coin.x, coin.y); ctx.rotate(t * 1.6); ctx.scale(pulse, pulse);
+      ctx.fillStyle = C.amber;
+      ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(14, 0); ctx.lineTo(0, 18); ctx.lineTo(-14, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.beginPath(); ctx.moveTo(0, -18); ctx.lineTo(5, -4); ctx.lineTo(-4, 0); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+
+    if (eraser && (playing || state === 'paused')) {
+      const b = 1 + Math.sin(tick / 7) * 0.1;
+      ctx.save(); ctx.translate(eraser.x, eraser.y); ctx.scale(b, b);
+      ctx.fillStyle = C.coral;
+      ctx.beginPath(); ctx.arc(0, 0, 17, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = C.deep; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-6, -6); ctx.lineTo(6, 6); ctx.moveTo(6, -6); ctx.lineTo(-6, 6); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = C.coral; ctx.font = `600 ${fs(18)}px ${MONO}`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillText('ERASE', eraser.x, eraser.y + 24);
+    }
+
+    // ghosts
+    if (playing) for (const g of ghosts) drawPreview(g, gf);
+    for (const g of ghosts) drawGhost(g, gf, playing, 1);
+
+    // player
+    if (state !== 'title' && state !== 'over') {
+      const showAt = rewinding ? nextStart : P;
+      if (!rewinding) {
+        for (let i = 0; i < P.trail.length; i += 2) {
+          const a = i / P.trail.length;
+          ctx.globalAlpha = a * 0.35;
+          ctx.fillStyle = C.amber;
+          ctx.beginPath(); ctx.arc(P.trail[i], P.trail[i + 1], R * (0.35 + a * 0.5), 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+      if (graceLeft > 0 && playing) {
+        ctx.strokeStyle = C.amber; ctx.lineWidth = 2; ctx.globalAlpha = graceLeft / GRACE;
+        ctx.beginPath(); ctx.arc(P.x, P.y, R + 10 + (GRACE - graceLeft) * 0.6, 0, Math.PI * 2); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+      ctx.fillStyle = C.amber;
+      ctx.beginPath(); ctx.arc(showAt.x, showAt.y, R, 0, Math.PI * 2); ctx.fill();
+      if (P.dash > 0) {
+        ctx.strokeStyle = C.chalk; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(showAt.x, showAt.y, R + 3, 0, Math.PI * 2); ctx.stroke();
+      }
+      drawEyes(showAt.x, showAt.y, P.vx, P.vy, C.deep, R);
+    }
+
+    // particles + popups
+    for (const p of particles) {
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.col;
+      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+    }
+    ctx.globalAlpha = 1;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const p of popups) {
+      ctx.globalAlpha = Math.min(1, (64 - p.t) / 20);
+      ctx.font = `600 ${Math.round(fs(22) * p.size)}px ${MONO}`;
+      ctx.lineWidth = 5; ctx.strokeStyle = C.deep; ctx.strokeText(p.text, p.x, p.y);
+      ctx.fillStyle = p.col; ctx.fillText(p.text, p.x, p.y);
+    }
+    ctx.globalAlpha = 1;
+
+    // rewind overlay: tape-style scanlines
+    if (rewinding) {
+      ctx.fillStyle = 'rgba(234,241,248,0.05)';
+      const off = (tick * 9) % 24;
+      for (let y = -24 + off; y < W; y += 24) ctx.fillRect(0, y, W, 6);
+      ctx.fillStyle = C.chalk; ctx.font = `400 ${fs(34)}px ${DISPLAY}`;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText('◀◀ 巻き戻し', 34, 30);
+    }
+
+    // banner
+    if (banner && state !== 'over') {
+      const a = Math.min(1, banner.t / 18);
+      ctx.globalAlpha = a;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = `400 64px ${DISPLAY}`;
+      ctx.lineWidth = 10; ctx.strokeStyle = C.deep; ctx.strokeText(banner.text, W / 2, 140);
+      ctx.fillStyle = C.chalk; ctx.fillText(banner.text, W / 2, 140);
+      ctx.font = `600 ${fs(24)}px ${MONO}`;
+      ctx.lineWidth = 6; ctx.strokeText(banner.sub, W / 2, 196);
+      ctx.fillStyle = C.amber; ctx.fillText(banner.sub, W / 2, 196);
+      ctx.globalAlpha = 1;
+    }
+
+    if (flash > 0) { ctx.fillStyle = `rgba(255,248,230,${flash * 0.35})`; ctx.fillRect(-60, -60, W + 120, W + 120); }
+
+    // floating joystick
+    if (joy) {
+      const r = board.getBoundingClientRect();
+      const ox = (joy.ox - r.left) / px, oy = (joy.oy - r.top) / px;
+      const kx = (joy.x - r.left) / px, ky = (joy.y - r.top) / px;
+      ctx.strokeStyle = 'rgba(234,241,248,0.35)'; ctx.lineWidth = 2 / px;
+      ctx.beginPath(); ctx.arc(ox, oy, 46 / px, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = 'rgba(234,241,248,0.3)';
+      ctx.beginPath(); ctx.arc(kx, ky, 18 / px, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  // ---- main loop ----
+  let last = performance.now(), acc = 0;
+  function loop(now) {
+    const dt = Math.min(100, now - last); last = now;
+    acc += dt * (slow > 0 ? 0.45 : 1);
+    let n = 0;
+    while (acc >= STEP && n < 6) { step(); acc -= STEP; n++; if (slow > 0) slow--; }
+    if (n === 6) acc = 0;
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  updateHud();
+  showTitle();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
