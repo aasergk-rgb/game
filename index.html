@@ -636,6 +636,11 @@ body.touch .keyhint { display: none; }
 .res-unlock b { color: var(--amber); }
 .res-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .res-actions .btn3d { flex-direction: column; gap: 4px; padding: 10px 6px 9px; font-family: var(--font-ui); font-size: 0.74rem; font-weight: 800; border-radius: 16px; }
+.share-img-wrap { display: grid; place-items: center; margin-bottom: 12px; }
+.share-img, .share-img-ph { width: min(62%, 300px); aspect-ratio: 4 / 5; border-radius: 16px; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4); -webkit-touch-callout: default; -webkit-user-select: auto; user-select: auto; }
+.share-img-ph { display: grid; place-items: center; background: rgba(5, 16, 34, 0.45); font-size: 0.8rem; font-weight: 800; color: var(--chalk-dim); }
+.img-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 10px; }
+.img-actions .btn3d { flex-direction: column; gap: 4px; padding: 10px 6px 9px; font-family: var(--font-ui); font-size: 0.74rem; font-weight: 800; border-radius: 16px; }
 .share-preview { padding: 14px 16px; border-radius: 16px; background: rgba(5, 16, 34, 0.45); font-size: 0.84rem; line-height: 1.7; -webkit-user-select: text; user-select: text; }
 .share-url { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ice); word-break: break-all; }
 .share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; margin: 18px 0 8px; }
@@ -783,6 +788,8 @@ body.touch .keyhint { display: none; }
     lock: svg('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
     up: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
     full: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    down: svg('<path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/>'),
+    image: svg('<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 16l-5-5-8 8.5"/>'),
     copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12v.01"/>'),
     check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
@@ -887,6 +894,7 @@ body.touch .keyhint { display: none; }
     ['skins15',  '大コレクター',   'スキンを15種類集める',                    4, 300, null,      () => [ownedCount(), 15]],
     ['share1',   'はじめてのシェア', '結果をシェアする',                      1,   0, null,      () => [save.stats.shares, 1]],
     ['shareDaily','デイリー自慢',  'デイリーチャレンジの結果をシェアする',    2,   0, null,      () => [F('shareDaily'), 1]],
+    ['shareImage','記念撮影',      '結果を画像で保存・シェアする',            1,   0, null,      () => [F('shareImage'), 1]],
     ['share5',   '宣伝部長',       '通算5回シェアする',                       2,   0, 'idol',    () => [save.stats.shares, 5]],
   ].map(([id, name, desc, tier, , skin, prog]) => ({ id, name, desc, tier, shards: TIER_SHARDS[tier], skin, prog }));
   // detail sheet: which series an achievement belongs to, what kind of record it tracks, and a hint
@@ -2252,7 +2260,16 @@ body.touch .keyhint { display: none; }
     share(o) {
       const full = o.text + '\n' + shareLink();
       const nets = shareNets(o.text);
+      const canCopyImg = !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write);
       return `${sheetHead('シェア', 'close')}
+        <div class="share-img-wrap"><img class="share-img" id="shareImg" alt="シェア用の結果画像" hidden><div class="share-img-ph" id="shareImgPh">画像を作成中…</div></div>
+        <div class="img-actions">
+          <button class="btn3d" type="button" data-act="img-save" disabled>${I.down}画像を保存</button>
+          ${navigator.share ? `<button class="btn3d dark" type="button" data-act="img-share" disabled>${I.share}画像をシェア</button>` : ''}
+          ${canCopyImg ? `<button class="btn3d dark" type="button" data-act="img-copy" disabled>${I.copy}<span class="lbl">画像をコピー</span></button>` : ''}
+        </div>
+        <p class="share-note muted">保存した画像を X や Instagram などに添付して投稿しよう。画像を長押ししても保存できます</p>
+        <p class="glabel">テキストでシェア</p>
         <div class="share-preview" id="sharePreview">${o.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>')}<br><span class="share-url">${shareLink()}</span></div>
         <div class="share-grid">
           ${nets.map(n => `<a class="sns" href="${n.href}" target="_blank" rel="noopener noreferrer" data-act="share-go" data-net="${n.id}"><span class="sns-ic" style="background:${n.bg};color:${n.fg}">${n.icon}</span>${n.label}</a>`).join('')}
@@ -2294,6 +2311,17 @@ body.touch .keyhint { display: none; }
     },
   };
   const AFTER = {
+    share(o) {
+      makeShareCard(o.card).then(blob => {
+        if (modalKind !== 'share' || modalOpts !== o) return;
+        o.blob = blob;
+        if (o.url) URL.revokeObjectURL(o.url);
+        o.url = URL.createObjectURL(blob);
+        const img = $('shareImg'); img.src = o.url; img.hidden = false;
+        $('shareImgPh').hidden = true;
+        for (const b of sheet.querySelectorAll('[data-act^="img-"]')) b.disabled = false;
+      }).catch(() => { const ph = $('shareImgPh'); if (ph) ph.textContent = '画像を作れませんでした'; });
+    },
     howto() {
       const car = $('carousel'), dots = [...$('dots').children], next = $('howtoNext');
       const idx = () => Math.round(car.scrollLeft / car.clientWidth);
@@ -2417,10 +2445,13 @@ body.touch .keyhint { display: none; }
         setTimeout(() => { if (modalKind === 'settings') b.textContent = document.fullscreenElement ? '元にもどす' : '全画面にする'; }, 300);
         break;
       case 'peek': hideSheet(); peekBack.hidden = false; revealT = 0; peekBack.focus(); break;
-      case 'share': openShare(shareText, { from: 'result', daily: mode === 'daily' }); break;
-      case 'share-best': openShare(bestShareText(), {}); break;
+      case 'share': openShare(shareText, { from: 'result', daily: mode === 'daily', card: resultCard() }); break;
+      case 'share-best': openShare(bestShareText(), { card: bestCard() }); break;
       case 'share-go': countShare(); buzz(8); break;   // the link itself opens the app or site
       case 'share-copy': copyShare(b); break;
+      case 'img-save': saveImage(); break;
+      case 'img-share': shareImageNative(); break;
+      case 'img-copy': copyImage(b); break;
       case 'share-native': navigator.share({ text: modalOpts.text, url: shareLink() }).then(countShare, () => {}); break;
       case 'reset':
         if (Date.now() - resetArmed < 4000) {
@@ -2459,6 +2490,149 @@ body.touch .keyhint { display: none; }
     ];
   }
   function openShare(text, opts) { openModal('share', Object.assign({ text }, opts || {})); }
+  // what goes on the image card, captured when the sheet opens
+  function resultCard() {
+    const loops = loopN - 1;
+    return { kind: 'result', mode, score, loops, chain: run.maxChain, nears: run.nears, phases: run.phases, rank: rankFor(loops), lanes: ghosts.map(g => g.path), skin: save.skin, date: today() };
+  }
+  function bestCard() {
+    return { kind: 'best', score: save.best.endless, loops: save.bestRun.loops, chain: save.bestRun.chain, level: save.level, ach: ACH.filter(achDone).length, rank: rankFor(save.bestRun.loops), skin: save.skin };
+  }
+
+  // Draws a 1080×1350 (4:5) result card: logo, the run's routes, score, title and stats.
+  async function makeShareCard(c) {
+    try { await Promise.all(['400 100px "Dela Gothic One"', '800 40px "M PLUS Rounded 1c"', '600 30px "IBM Plex Mono"'].map(f => document.fonts.load(f, 'エコーラン称号0123'))); } catch (e) {}
+    const Wc = 1080, Hc = 1350, cvs = document.createElement('canvas');
+    cvs.width = Wc; cvs.height = Hc;
+    const g = cvs.getContext('2d'), TAU = Math.PI * 2;
+    const DF = '"Dela Gothic One", sans-serif', RF = '"M PLUS Rounded 1c", sans-serif', MF = '"IBM Plex Mono", monospace';
+    const rr = (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
+    // background: night blueprint
+    const bg = g.createLinearGradient(0, 0, 0, Hc); bg.addColorStop(0, '#1d4f91'); bg.addColorStop(0.55, '#0f2b52'); bg.addColorStop(1, '#081a33');
+    g.fillStyle = bg; g.fillRect(0, 0, Wc, Hc);
+    g.strokeStyle = 'rgba(234,241,248,0.05)'; g.lineWidth = 2;
+    for (let i = 54; i < Hc; i += 54) { g.beginPath(); g.moveTo(0, i); g.lineTo(Wc, i); g.stroke(); }
+    for (let i = 54; i < Wc; i += 54) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, Hc); g.stroke(); }
+    // logo with its echo
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `400 104px ${DF}`;
+    const lw = g.measureText('エコーラン').width, lx = Wc / 2 - lw / 2;
+    g.textAlign = 'left';
+    for (const [dx, a] of [[-16, 0.1], [-8, 0.22]]) { g.fillStyle = `rgba(234,241,248,${a})`; g.fillText('エコーラン', lx + dx, 128); }
+    g.fillStyle = '#eaf1f8'; g.fillText('エコー', lx, 128);
+    g.fillStyle = '#ffb627'; g.fillText('ラン', lx + g.measureText('エコー').width, 128);
+    g.textAlign = 'center';
+    g.font = `600 30px ${MF}`; g.fillStyle = '#9fb6d3';
+    g.fillText(c.kind === 'best' ? 'MY BEST RECORD' : (c.mode === 'daily' ? 'DAILY ' + c.date : 'ENDLESS · ' + c.date), Wc / 2, 210);
+    // panel: the routes of every loop in this run
+    const px0 = 70, py0 = 252, pw = 940, ph = 560;
+    rr(px0, py0, pw, ph, 36); g.fillStyle = 'rgba(5,16,34,0.55)'; g.fill();
+    g.strokeStyle = 'rgba(234,241,248,0.16)'; g.lineWidth = 2; g.stroke();
+    const sk = skinOf(c.skin);
+    if (c.kind === 'result' && c.lanes.length) {
+      const S = 500, ox = Wc / 2 - S / 2, oy = py0 + (ph - S) / 2, k = S / 1000;
+      g.strokeStyle = 'rgba(234,241,248,0.12)'; g.lineWidth = 2; g.strokeRect(ox, oy, S, S);
+      g.lineCap = 'round'; g.lineJoin = 'round';
+      c.lanes.forEach((path, i) => {
+        const t = c.lanes.length > 1 ? i / (c.lanes.length - 1) : 1;
+        g.strokeStyle = t > 0.66 ? sk.color : t > 0.33 ? '#eaf1f8' : '#7f97b8';
+        g.globalAlpha = 0.5 + t * 0.5; g.lineWidth = 6;
+        g.beginPath();
+        for (let j = 0; j < path.length; j += 6) { const x = ox + path[j] * k, y = oy + path[j + 1] * k; j ? g.lineTo(x, y) : g.moveTo(x, y); }
+        g.stroke();
+      });
+      g.globalAlpha = 1;
+      g.font = `600 26px ${MF}`; g.fillStyle = '#9fb6d3'; g.textAlign = 'left';
+      g.fillText(`${c.lanes.length} ROUTES`, px0 + 30, py0 + 40);
+      g.textAlign = 'center';
+    } else {
+      // no routes to show: the character running with its echoes
+      const cy = py0 + ph / 2;
+      for (const [dx, a] of [[-270, 0.25], [-180, 0.45], [-90, 0.7]]) {
+        g.globalAlpha = a; g.setLineDash([16, 12]); g.strokeStyle = '#eaf1f8'; g.lineWidth = 7;
+        g.beginPath(); g.arc(Wc / 2 + 60 + dx, cy, 82, 0, TAU); g.stroke();
+      }
+      g.setLineDash([]); g.globalAlpha = 1;
+    }
+    // the player's skin, big, at the panel corner
+    const cx = c.kind === 'result' && c.lanes.length ? px0 + pw - 110 : Wc / 2 + 70, cy2 = c.kind === 'result' && c.lanes.length ? py0 + ph - 100 : py0 + ph / 2;
+    const cr = c.kind === 'result' && c.lanes.length ? 74 : 92;
+    g.fillStyle = 'rgba(0,0,0,0.35)';
+    g.beginPath(); g.ellipse(cx, cy2 + cr * 1.05, cr * 0.85, cr * 0.18, 0, 0, TAU); g.fill();
+    drawSkin(g, cx, cy2, cr, sk, { t: 0 });
+    // score
+    g.font = `600 30px ${MF}`; g.fillStyle = '#9fb6d3';
+    g.fillText(c.kind === 'best' ? 'BEST SCORE' : 'SCORE', Wc / 2, 878);
+    g.font = `400 136px ${DF}`; g.fillStyle = '#ffb627';
+    g.fillText(fmt(c.score), Wc / 2, 950);
+    // title badge
+    g.font = `400 50px ${DF}`;
+    const bw = Math.max(330, g.measureText(c.rank).width + 110), by = 1058;
+    rr(Wc / 2 - bw / 2, by - 6, bw, 112, 26); g.fillStyle = 'rgba(255,182,39,0.12)'; g.fill();
+    g.strokeStyle = '#ffb627'; g.lineWidth = 4; g.stroke();
+    g.font = `800 24px ${RF}`; g.fillStyle = '#ffb627'; g.fillText('称 号', Wc / 2, by + 24);
+    g.font = `400 50px ${DF}`; g.fillText(c.rank, Wc / 2, by + 70);
+    // stats
+    const stats = c.kind === 'best'
+      ? [['最高LOOP', c.loops], ['最大CHAIN', c.chain], ['レベル', c.level], ['実績', c.ach]]
+      : [['LOOP', c.loops], ['CHAIN', c.chain], ['ニアミス', c.nears], ['すり抜け', c.phases]];
+    const cw = 222, gap = 17, sx = (Wc - (cw * 4 + gap * 3)) / 2, sy = 1180;
+    stats.forEach(([label, v], i) => {
+      const x = sx + i * (cw + gap);
+      rr(x, sy, cw, 104, 22); g.fillStyle = 'rgba(234,241,248,0.08)'; g.fill();
+      g.font = `800 24px ${RF}`; g.fillStyle = '#9fb6d3'; g.fillText(label, x + cw / 2, sy + 30);
+      g.font = `400 46px ${DF}`; g.fillStyle = '#eaf1f8'; g.fillText(String(v), x + cw / 2, sy + 72);
+    });
+    // footer
+    g.font = `800 28px ${RF}`; g.fillStyle = '#eaf1f8'; g.textAlign = 'left';
+    g.fillText('#エコーラン', 70, 1318);
+    g.font = `600 22px ${MF}`; g.fillStyle = '#9fb6d3'; g.textAlign = 'right';
+    g.fillText(shareLink().replace(/^https?:\/\//, ''), Wc - 70, 1318);
+    return await new Promise((res, rej) => cvs.toBlob(b => b ? res(b) : rej(new Error('toBlob')), 'image/png'));
+  }
+
+  // saving goes through the viewer's download prompt when embedded, a plain download link otherwise
+  let downloads = null;
+  try { if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }, () => {}); } catch (e) {}
+  const imageName = () => { const c = modalOpts.card || {}; return `echorun-${c.kind === 'best' ? 'best' : c.mode || 'run'}-${c.score || 0}.png`; };
+  function imageDone(msg) {
+    save.flags.shareImage = 1;
+    countShare();
+    if (msg) toast(I.image, msg, '');
+  }
+  function saveImage() {
+    const blob = modalOpts.blob;
+    if (!blob) return;
+    if (downloads) {
+      downloads.save({ filename: imageName(), data: blob }).then(() => imageDone('画像を保存しました'), err => {
+        if (err && (err.code === 'declined' || err.code === 'rate_limited')) return;
+        toast(I.image, '保存できませんでした', '画像を長押しして保存してください');
+      });
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = modalOpts.url; a.download = imageName();
+    document.body.appendChild(a); a.click(); a.remove();
+    imageDone('画像を保存しました');
+  }
+  function shareImageNative() {
+    const blob = modalOpts.blob;
+    if (!blob) return;
+    const file = new File([blob], imageName(), { type: 'image/png' });
+    const data = { files: [file], text: modalOpts.text + '\n' + shareLink() };
+    if (navigator.canShare && !navigator.canShare(data)) { toast(I.image, '画像の共有に対応していません', '「画像を保存」してから投稿してください'); return; }
+    navigator.share(data).then(() => imageDone(), err => {
+      if (err && err.name === 'AbortError') return;
+      toast(I.image, '画像の共有に対応していません', '「画像を保存」してから投稿してください');
+    });
+  }
+  function copyImage(b) {
+    const blob = modalOpts.blob;
+    if (!blob) return;
+    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
+      b.querySelector('.lbl').textContent = 'コピー済み'; imageDone();
+    }, () => toast(I.image, 'コピーできませんでした', '「画像を保存」を使ってください'));
+  }
   function bestShareText() {
     return `エコーラン ベスト記録\nエンドレス ${fmt(save.best.endless)}点・最高${save.bestRun.loops}ループ 称号「${rankFor(save.bestRun.loops)}」\nLv.${save.level} 実績 ${ACH.filter(achDone).length}/${ACH.length}\n#エコーラン`;
   }
