@@ -773,6 +773,7 @@ body.touch .keyhint { display: none; }
     { id: 'sunrise', name: 'サンライズ',   color: '#ff8f5a', pat: 'gradient', c2: '#ffd75e', eyes: 'happy', rar: 'SR', src: 'login' },
   ];
   const RARITY = { N: 'ノーマル', R: 'レア', SR: 'スーパーレア', UR: 'ウルトラレア' };
+  const TIER_SHARDS = [0, 5, 15, 30, 60, 120];   // shard reward by difficulty: ★1 … ★5
   const TIERS = [null, ['かんたん', '#9fb6d3'], ['ふつう', '#5fe3b8'], ['むずかしい', '#6cc6ff'], ['とても難しい', '#b79bff'], ['伝説', '#ffb627']];
   // Achievements: [id, name, description, tier 1-5, shard reward, skin reward or null, progress () => [value, target]]
   const B = k => Math.max(save.bestRun[k] || 0, liveRun()[k] || 0);
@@ -825,27 +826,27 @@ body.touch .keyhint { display: none; }
     ['level25',  'レベル25',       'レベル25になる',                          5, 500, null,      () => [save.level, 25]],
     ['skins5',   'コレクター',     'スキンを5種類集める',                     2,  80, null,      () => [ownedCount(), 5]],
     ['skins15',  '大コレクター',   'スキンを15種類集める',                    4, 300, null,      () => [ownedCount(), 15]],
-  ].map(([id, name, desc, tier, shards, skin, prog]) => ({ id, name, desc, tier, shards, skin, prog }));
+  ].map(([id, name, desc, tier, , skin, prog]) => ({ id, name, desc, tier, shards: TIER_SHARDS[tier], skin, prog }));
   const LEVEL_SKINS = { 5: 'bubble', 10: 'ninja', 15: 'wizard', 20: 'royal', 30: 'aurora' };
-  const levelReward = lv => ({ shards: 30 + lv * 10, skin: LEVEL_SKINS[lv] || null });
-  const LOGIN = [20, 30, 40, 50, 60, 80, 150];
+  const levelReward = lv => ({ shards: 5 + lv * 3, skin: LEVEL_SKINS[lv] || null });
+  const LOGIN = [10, 10, 15, 15, 20, 25, 40];
   // Daily missions: three are drawn per day from this pool; sum = adds up over the day, max = in a single run
   const MISSION_POOL = [
-    { id: 'loops',  kind: 'sum', key: 'loops',  ns: [8, 12, 20],      rw: [30, 40, 60], text: n => `合計${n}ループする` },
-    { id: 'coins',  kind: 'sum', key: 'coins',  ns: [10, 20, 30],     rw: [30, 40, 60], text: n => `コインを合計${n}枚取る` },
-    { id: 'near',   kind: 'sum', key: 'nears',  ns: [4, 8, 12],       rw: [30, 45, 60], text: n => `ニアミスを合計${n}回` },
-    { id: 'phase',  kind: 'sum', key: 'phases', ns: [2, 4, 6],        rw: [30, 45, 60], text: n => `ダッシュすり抜けを合計${n}回` },
-    { id: 'chain',  kind: 'max', key: 'chain',  ns: [2, 3, 4],        rw: [30, 45, 70], text: n => `CHAIN ${n} を出す` },
-    { id: 'run',    kind: 'max', key: 'loops',  ns: [5, 8, 12],       rw: [30, 45, 70], text: n => `1回のプレイで${n}ループ` },
-    { id: 'score',  kind: 'max', key: 'score',  ns: [1500, 3000, 5000], rw: [30, 45, 70], text: n => `1回のプレイで${fmt(n)}点` },
-    { id: 'plays',  kind: 'sum', key: 'plays',  ns: [3, 5],           rw: [30, 45],     text: n => `${n}回プレイする` },
-    { id: 'daily',  kind: 'sum', key: 'daily',  ns: [1],              rw: [40],         text: () => 'デイリーチャレンジを遊ぶ' },
-    { id: 'erase',  kind: 'sum', key: 'erases', ns: [1, 2],           rw: [40, 60],     text: n => n > 1 ? `消しゴムを合計${n}回使う` : '消しゴムを使う' },
+    { id: 'loops',  kind: 'sum', key: 'loops',  ns: [8, 12, 20],      rw: [10, 15, 20], text: n => `合計${n}ループする` },
+    { id: 'coins',  kind: 'sum', key: 'coins',  ns: [10, 20, 30],     rw: [10, 15, 20], text: n => `コインを合計${n}枚取る` },
+    { id: 'near',   kind: 'sum', key: 'nears',  ns: [4, 8, 12],       rw: [10, 15, 20], text: n => `ニアミスを合計${n}回` },
+    { id: 'phase',  kind: 'sum', key: 'phases', ns: [2, 4, 6],        rw: [10, 15, 20], text: n => `ダッシュすり抜けを合計${n}回` },
+    { id: 'chain',  kind: 'max', key: 'chain',  ns: [2, 3, 4],        rw: [10, 15, 25], text: n => `CHAIN ${n} を出す` },
+    { id: 'run',    kind: 'max', key: 'loops',  ns: [5, 8, 12],       rw: [10, 15, 25], text: n => `1回のプレイで${n}ループ` },
+    { id: 'score',  kind: 'max', key: 'score',  ns: [1500, 3000, 5000], rw: [10, 15, 25], text: n => `1回のプレイで${fmt(n)}点` },
+    { id: 'plays',  kind: 'sum', key: 'plays',  ns: [3, 5],           rw: [10, 15],     text: n => `${n}回プレイする` },
+    { id: 'daily',  kind: 'sum', key: 'daily',  ns: [1],              rw: [15],         text: () => 'デイリーチャレンジを遊ぶ' },
+    { id: 'erase',  kind: 'sum', key: 'erases', ns: [1, 2],           rw: [15, 20],     text: n => n > 1 ? `消しゴムを合計${n}回使う` : '消しゴムを使う' },
   ];
-  const MISSION_BONUS = 50;
+  const MISSION_BONUS = 20;
   const RANKS = [[0, '迷子'], [3, '見習いランナー'], [6, 'ループ慣れ'], [10, '残像使い'], [15, '時間の曲芸師'], [20, '因果の外側'], [30, 'エコーマスター']];
   const rankFor = loops => { let r = RANKS[0][1]; for (const [n, name] of RANKS) if (loops >= n) r = name; return r; };
-  const needXp = lv => 60 + lv * 40;
+  const needXp = lv => 100 + lv * 60 + lv * lv * 5;   // Lv1→2: 165 XP, Lv9→10: 1,045 XP
 
   // ================= save data (per browser) =================
   const SAVE_KEY = 'echorun-save-v1';
@@ -1246,9 +1247,9 @@ body.touch .keyhint { display: none; }
     st.loops += loops; st.nears += run.nears; st.phases += run.phases; st.ms += Math.round(run.frames * STEP);
     for (const k in lr) br[k] = Math.max(br[k] || 0, lr[k]);
     // rewards: shards for every run, XP towards the next level
-    const shardGain = loops * 2 + Math.floor(score / 250) + (run.firstDaily ? 20 : 0);
+    const shardGain = Math.floor(loops / 2) + Math.floor(score / 1000) + (run.firstDaily ? 5 : 0);
     addShards(shardGain);
-    const xpGain = loops * 20 + Math.floor(score / 40) + 5;
+    const xpGain = loops * 10 + Math.floor(score / 100) + 5;
     const ups = addXp(xpGain);
     const missionsDone = missionProgress({ loops, coins: loops, nears: run.nears, phases: run.phases, chain: run.maxChain, score, plays: 1, daily: mode === 'daily' ? 1 : 0, erases: run.erases });
     save.tutorial = true;
@@ -1383,7 +1384,7 @@ body.touch .keyhint { display: none; }
     const first = !save.tutorialDone;
     save.tutorialDone = true; save.howtoSeen = true;
     let ups = 0, xpGain = 0;
-    if (first) { xpGain = 50; ups = addXp(xpGain).length; }
+    if (first) { xpGain = 30; ups = addXp(xpGain).length; }
     save.flags.tutorial = 1;
     persist();
     checkAch();
@@ -1626,7 +1627,7 @@ body.touch .keyhint { display: none; }
     if (!m || m.claimed || !missionDone(m)) return;
     m.claimed = true;
     save.stats.missions++;
-    addShards(m.reward); addXp(15);
+    addShards(m.reward); addXp(10);
     sfx.coin(); buzz(12);
     persist(); checkAch(); updateBadges();
   }
@@ -1779,7 +1780,7 @@ body.touch .keyhint { display: none; }
         </button>
         <button class="daily-card" type="button" data-act="daily">
           <span class="dc-icon">${I.cal(new Date().getDate())}</span>
-          <span class="dc-text"><b>デイリーチャレンジ</b><small>${shortDate()} · ${played ? '全員が同じステージ' : '今日の初回プレイ ◆+20'}</small></span>
+          <span class="dc-text"><b>デイリーチャレンジ</b><small>${shortDate()} · ${played ? '全員が同じステージ' : '今日の初回プレイ ◆+5'}</small></span>
           <span class="dc-best"><small>今日のBEST</small><b>${fmt(save.daily.best)}</b></span>
           ${played ? '' : '<span class="badge-new">NEW</span>'}
         </button>
@@ -2095,7 +2096,7 @@ body.touch .keyhint { display: none; }
       return `${sheetHead('レベル')}
         <div class="card lv-head">${charHTML(save.skin)}<div><b>Lv.${lv}</b><small>${rankFor(save.bestRun.loops)}</small><span class="xpbar"><i style="--p:${Math.round(save.xp / need * 100)}%"></i></span><small>つぎのレベルまで あと ${fmt(need - save.xp)} XP</small></div></div>
         <ul class="tips" style="margin-top:12px">
-          <li><b>XP</b> はプレイするとたまる（1ループ = 20 XP、スコア40点 = 1 XP、ミッション受け取り = 15 XP）。</li>
+          <li><b>XP</b> はプレイするとたまる（1ループ = 10 XP、スコア100点 = 1 XP、ミッション受け取り = 10 XP）。</li>
           <li>レベルが上がるたびに <b>カケラ</b>、決まったレベルで <b>限定スキン</b> がもらえる。</li>
         </ul>
         <p class="glabel">レベル報酬</p>
