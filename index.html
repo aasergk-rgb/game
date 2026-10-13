@@ -614,8 +614,15 @@ body.touch .keyhint { display: none; }
 .res-score b { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(2.6rem, 14vw, 3.6rem); line-height: 1.1; color: var(--amber); font-variant-numeric: tabular-nums; }
 .newbest { position: absolute; top: -10px; right: 14px; padding: 4px 12px; border-radius: 999px; background: var(--coral); color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; box-shadow: 0 3px 0 var(--coral-deep); transform: rotate(4deg); animation: stamp 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both; animation-delay: 1s; }
 .stamp-wrap { display: flex; justify-content: center; }
-.stamp { display: inline-flex; align-items: baseline; gap: 10px; padding: 6px 18px; border: 3px solid var(--amber); border-radius: 12px; color: var(--amber); transform: rotate(-4deg); font-size: 0.74rem; font-weight: 800; animation: stamp 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both; animation-delay: 0.7s; }
-.stamp b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; }
+.stamp {
+  display: inline-flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 8px 26px 10px; border: 2px solid var(--amber); border-radius: 16px;
+  background: rgba(255, 182, 39, 0.1); color: var(--amber);
+  animation: badge-in 0.45s cubic-bezier(0.2, 1.5, 0.4, 1) both; animation-delay: 0.7s;
+}
+.stamp small { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.3em; text-indent: 0.3em; opacity: 0.85; line-height: 1; }
+.stamp b { font-family: var(--font-display); font-weight: 400; font-size: 1.35rem; line-height: 1.15; letter-spacing: 0.04em; }
+@keyframes badge-in { from { opacity: 0; transform: scale(1.5); } }
 @keyframes stamp { from { opacity: 0; transform: scale(2.2) rotate(-12deg); } }
 .res-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .res-stats div { padding: 10px 4px; border-radius: 16px; background: rgba(234, 241, 248, 0.07); }
@@ -2234,7 +2241,7 @@ body.touch .keyhint { display: none; }
         <p class="res-cause">${cause}</p>
         <h2 class="res-title">GAME OVER</h2>
         <div class="res-score"><small>${mode === 'daily' ? 'DAILY ' + shortDate() : 'ENDLESS'} · SCORE</small><b id="resScore">0</b>${o.isBest && score > 0 ? '<span class="newbest">NEW BEST!</span>' : ''}</div>
-        <div class="stamp-wrap"><span class="stamp">称号<b>${rank}</b></span></div>
+        <div class="stamp-wrap"><span class="stamp"><small>称号</small><b>${rank}</b></span></div>
         <div class="res-stats">
           <div><small>LOOP</small><b>${loops}</b></div>
           <div><small>CHAIN</small><b>${run.maxChain}</b></div>
