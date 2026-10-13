@@ -319,6 +319,126 @@ body.touch .keyhint { display: none; }
 .skin-show .char.pop { animation: skin-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1), bob 2s ease-in-out 0.45s infinite; }
 @keyframes skin-pop { from { transform: scale(0.6); } }
 
+/* ---------- meta: shards, skins, missions, levels ---------- */
+.char.cv { background: none; box-shadow: none; }
+.char.cv::before, .char.cv::after { display: none; }
+.char.cv canvas { position: absolute; left: -30%; top: -30%; width: 160%; height: 160%; pointer-events: none; filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.28)); }
+.gem { display: inline-block; flex: none; width: 13px; height: 13px; border-radius: 3px; transform: rotate(45deg); background: linear-gradient(135deg, #e3fbff, var(--ice) 45%, #36a9dc); box-shadow: inset 0 0 0 1.5px rgba(8, 26, 51, 0.3); }
+.wallet { display: inline-flex; align-items: center; gap: 9px; height: 42px; padding: 0 15px 0 13px; border-radius: 999px; cursor: pointer; border: 1px solid var(--card-line); background: var(--card); box-shadow: 0 4px 0 var(--card-deep); font-family: var(--font-display); font-size: 1rem; }
+.wallet b { font-weight: 400; font-variant-numeric: tabular-nums; }
+.wallet:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--card-deep); }
+.wallet.bump { animation: bump 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes bump { 35% { transform: scale(1.16); } }
+.rw { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 400; font-size: 0.92rem; white-space: nowrap; }
+.rw .gem { width: 11px; height: 11px; }
+.rw-skin { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 800; color: var(--amber); white-space: nowrap; }
+.rw-skin .char { width: 18px !important; height: 18px !important; }
+.badge { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-grid; place-items: center; background: var(--coral); color: #fff; font-size: 0.62rem; font-weight: 800; box-shadow: 0 2px 0 var(--coral-deep); }
+.tab { position: relative; }
+.tab .badge { position: absolute; top: 0; left: calc(50% + 10px); }
+.btn3d.small { padding: 8px 14px; font-size: 0.82rem; border-radius: 12px; box-shadow: 0 4px 0 var(--d); }
+.btn3d.small:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--d); }
+.btn3d:disabled { filter: saturate(0.4) brightness(0.85); cursor: default; transform: none; }
+.btn3d .gem { width: 15px; height: 15px; }
+.segbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; margin: 0 0 12px; padding: 4px; border-radius: 14px; background: rgba(5, 16, 34, 0.45); }
+.segbar button { position: relative; padding: 9px 4px; border: 0; border-radius: 10px; background: none; cursor: pointer; font-size: 0.8rem; font-weight: 800; color: var(--chalk-dim); }
+.segbar button[aria-pressed="true"] { background: var(--card-hi); color: var(--chalk); box-shadow: 0 3px 0 var(--card-deep); }
+.segbar .badge { position: absolute; top: -7px; right: 8px; }
+.segbar.small button { padding: 7px 4px; font-size: 0.72rem; }
+.eyebrow-s { margin: 0; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.24em; color: var(--ice); }
+/* home: today's missions */
+.mstrip { position: relative; width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 14px; border: 0; border-radius: 18px; cursor: pointer; text-align: left; background: rgba(5, 16, 34, 0.42); box-shadow: inset 0 0 0 1px var(--card-line); }
+.mstrip:active { transform: scale(0.99); }
+.ms-ic { width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center; background: rgba(79, 216, 168, 0.16); color: var(--mint); }
+.ms-ic svg { width: 22px; height: 22px; }
+.ms-text b { display: block; font-size: 0.86rem; font-weight: 800; }
+.bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 6px; }
+.bars i { position: relative; height: 6px; border-radius: 3px; overflow: hidden; background: rgba(234, 241, 248, 0.15); }
+.bars i::after { content: ""; position: absolute; inset: 0; width: var(--p); border-radius: 3px; background: var(--mint); }
+.ms-go { font-size: 1.4rem; color: var(--chalk-dim); }
+/* missions */
+.mission-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 0.84rem; font-weight: 800; }
+.mission-head small { font-family: var(--font-mono); font-size: 0.66rem; color: var(--chalk-dim); }
+.mis, .bonus { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px 12px; padding: 12px 14px; }
+.mi { grid-row: 1 / 3; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: rgba(234, 241, 248, 0.08); color: var(--chalk-dim); }
+.mi svg { width: 24px; height: 24px; }
+.mis.done .mi { background: rgba(79, 216, 168, 0.18); color: var(--mint); }
+.mis b { font-size: 0.86rem; font-weight: 800; line-height: 1.4; }
+.mis .act { grid-row: 1 / 3; grid-column: 3; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.mis .meta { grid-column: 2; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.66rem; color: var(--chalk-dim); }
+.mis .meta .xpbar { flex: 1; height: 6px; }
+.mis.claimed, .bonus.claimed, .ach.claimed { opacity: 0.55; }
+.bonus { margin-top: 10px; grid-template-columns: auto minmax(0, 1fr) auto; }
+.bonus .mi { grid-row: auto; background: rgba(255, 182, 39, 0.16); color: var(--amber); }
+.bonus b { display: block; font-size: 0.86rem; font-weight: 800; }
+.bonus small { font-size: 0.7rem; color: var(--chalk-dim); }
+.claimed-mark { display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 800; color: var(--mint); white-space: nowrap; }
+.claimed-mark svg { width: 15px; height: 15px; }
+.login-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 10px; margin-bottom: 10px; }
+.lg { position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 2px 7px; border-radius: 12px; background: rgba(234, 241, 248, 0.07); color: var(--chalk-dim); }
+.lg small { font-size: 0.56rem; font-weight: 800; white-space: nowrap; }
+.lg b { font-family: var(--font-display); font-weight: 400; font-size: 0.8rem; color: var(--chalk); }
+.lg .char { width: 22px !important; height: 22px !important; }
+.lg.today { background: linear-gradient(var(--amber-hi), var(--amber)); color: var(--bg-1); box-shadow: 0 3px 0 var(--amber-deep); }
+.lg.today b { color: var(--bg-1); }
+.lg.got::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; border-radius: 12px; background: rgba(5, 16, 34, 0.6); color: var(--mint); font-size: 1.3rem; font-weight: 800; }
+.login-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.login-grid .lg { padding: 12px 4px 10px; }
+.login-grid .lg small { font-size: 0.64rem; }
+.login-grid .lg b { font-size: 1rem; }
+.login-grid .lg.big { grid-column: span 2; }
+.login-grid .lg .char { width: 30px !important; height: 30px !important; }
+/* achievements */
+.ach { grid-template-columns: auto minmax(0, 1fr); gap: 3px 12px; align-items: start; }
+.ach .medal { grid-row: 1 / 5; align-self: center; box-shadow: inset 0 0 0 2px var(--tc); color: var(--tc); background: rgba(5, 16, 34, 0.3); }
+.ach.done .medal { background: var(--tc); color: var(--bg-1); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3); }
+.tier { font-size: 0.7rem; letter-spacing: -1px; color: var(--tc); white-space: nowrap; }
+.tier i { font-style: normal; color: rgba(234, 241, 248, 0.15); }
+.ach-desc em { font-style: normal; font-weight: 800; color: var(--tc); }
+.ach-foot { display: flex; align-items: center; gap: 8px; }
+.ach-foot .xpbar { flex: 1; height: 5px; }
+.ach-foot small { font-family: var(--font-mono); font-size: 0.62rem; color: var(--chalk-dim); white-space: nowrap; }
+.ach-rw { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-top: 2px; }
+.ach-rw .btn3d, .ach-rw .claimed-mark { margin-left: auto; }
+/* skins */
+.skin-show .btn3d { margin-top: 4px; }
+.skin-show .how { max-width: 22em; text-align: center; font-size: 0.76rem; color: var(--chalk-dim); }
+.rar { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; color: var(--bg-1); }
+.rar.N { background: #9fb6d3; } .rar.R { background: #6cc6ff; } .rar.SR { background: #b79bff; }
+.rar.UR { background: linear-gradient(90deg, #ffb627, #ff6f59, #b79bff); color: #fff; }
+.rar-dot { position: absolute; top: 9px; left: 9px; width: 8px; height: 8px; border-radius: 50%; }
+.rar-dot.N { background: #9fb6d3; } .rar-dot.R { background: #6cc6ff; } .rar-dot.SR { background: #b79bff; } .rar-dot.UR { background: linear-gradient(135deg, #ffb627, #ff6f59, #b79bff); }
+.skin-cell { position: relative; }
+.skin-cell[data-sel="true"] { border-color: var(--chalk); }
+.skin-cell[aria-pressed="true"] { border-color: var(--amber); }
+.skin-cell.locked .char { opacity: 0.6; }
+.skin-cell small.on { color: var(--amber); font-weight: 800; }
+.skin-cell .price { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-display); font-size: 0.74rem; color: var(--chalk); }
+.skin-cell .price .gem { width: 10px; height: 10px; }
+.lockb { position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: rgba(5, 16, 34, 0.7); color: var(--chalk-dim); }
+.lockb svg { width: 12px; height: 12px; }
+/* level sheet */
+.lv-head { display: flex; align-items: center; gap: 18px; padding: 16px 18px; }
+.lv-head .char { width: 58px; height: 58px; flex: none; }
+.lv-head > div { flex: 1; display: grid; gap: 5px; }
+.lv-head b { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1; }
+.lv-head small { font-size: 0.72rem; color: var(--chalk-dim); font-weight: 800; }
+.lv-head .xpbar { height: 9px; }
+.lv-rows { display: grid; gap: 7px; }
+.lv-row { display: grid; grid-template-columns: 62px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 14px; background: rgba(234, 241, 248, 0.06); }
+.lv-row .ln { font-family: var(--font-display); font-size: 1rem; }
+.lv-rw { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.lv-st { font-size: 0.7rem; font-weight: 800; color: var(--amber); }
+.lv-st svg { width: 16px; height: 16px; color: var(--mint); }
+.lv-row.got { opacity: 0.5; }
+.lv-row.next { box-shadow: inset 0 0 0 2px var(--amber); }
+/* results */
+.res-gain { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.rg { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 84px; padding: 8px 12px; border-radius: 14px; background: rgba(234, 241, 248, 0.07); }
+.rg .rw { font-size: 1.15rem; }
+.rg .rw .gem { width: 13px; height: 13px; }
+.rg small { font-size: 0.6rem; font-weight: 800; color: var(--chalk-dim); }
+
 /* ---------- tutorial ---------- */
 .tut { position: absolute; z-index: 2; left: 10px; right: 10px; top: 16px; display: flex; justify-content: center; pointer-events: none; }
 .tut-card {
@@ -506,7 +626,7 @@ body.touch .keyhint { display: none; }
 <body>
 <div class="app" id="app">
   <section class="view boot" id="vBoot" aria-label="タイトル">
-    <div class="hero-stage" aria-hidden="true"><span class="track"></span><span class="echo e3"></span><span class="echo e2"></span><span class="echo e1"></span><span class="char" id="bootChar"></span></div>
+    <div class="hero-stage" aria-hidden="true"><span class="track"></span><span class="echo e3"></span><span class="echo e2"></span><span class="echo e1"></span><span class="char cv" id="bootChar"><canvas></canvas></span></div>
     <h1 class="logo">エコー<em>ラン</em></h1>
     <p class="tagline">敵はぜんぶ、過去のあなた。</p>
     <button class="tap" id="tapStart" type="button">TAP TO START</button>
@@ -515,11 +635,11 @@ body.touch .keyhint { display: none; }
 
   <section class="view home" id="vHome" hidden>
     <header class="topbar">
-      <button class="profile" type="button" data-act="tab" data-tab="skins" aria-label="プロフィールとスキン">
-        <span class="char" id="pChar"></span>
+      <button class="profile" type="button" data-act="level" aria-label="レベルと報酬">
+        <span class="char cv" id="pChar"><canvas></canvas></span>
         <span class="pinfo"><b id="pRank">見習いランナー</b><span class="lv"><em id="pLv">Lv.1</em><span class="xpbar"><i id="pXp"></i></span></span></span>
       </button>
-      <button class="roundbtn" type="button" data-act="howto" aria-label="あそびかた" id="helpBtn"></button>
+      <button class="wallet" type="button" data-act="tab" data-tab="skins" aria-label="カケラ（スキンショップへ）" id="wallet"><span class="gem"></span><b id="pShards">0</b></button>
       <button class="roundbtn" type="button" data-act="settings" aria-label="設定" id="gearBtn"></button>
     </header>
     <main class="pages" id="pages"><div class="page" id="page"></div></main>
@@ -606,37 +726,123 @@ body.touch .keyhint { display: none; }
     lock: svg('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
     up: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
     full: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12v.01"/>'),
+    check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    gift: svg('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-2-4-6-4-6-1.5S9 9 12 9zM12 9c2-4 6-4 6-1.5S15 9 12 9z"/>'),
+    bag: svg('<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
     cal: d => `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><rect x="7" y="10" width="34" height="31" rx="5"/><path d="M7 19h34M16 6v8M32 6v8"/><text x="24" y="36.5" text-anchor="middle" font-size="14" font-weight="800" fill="currentColor" stroke="none" font-family="sans-serif">${d}</text></svg>`,
   };
-  $('helpBtn').innerHTML = I.help;
   $('gearBtn').innerHTML = I.gear;
 
   // ================= content =================
-  const ACH = [
-    { id: 'first',   name: 'はじめの一歩',   desc: 'はじめてコインを取る' },
-    { id: 'loop5',   name: 'ループ入門',     desc: '1回のプレイで5ループ' },
-    { id: 'loop10',  name: '残像使い',       desc: '1回のプレイで10ループ' },
-    { id: 'loop20',  name: '因果の外側',     desc: '1回のプレイで20ループ' },
-    { id: 'loop30',  name: 'エコーマスター', desc: '1回のプレイで30ループ' },
-    { id: 'near10',  name: 'かすり職人',     desc: '1回のプレイでニアミス10回' },
-    { id: 'phase5',  name: 'すり抜け名人',   desc: '1回のプレイでダッシュすり抜け5回' },
-    { id: 'chain5',  name: '最短の美学',     desc: 'CHAIN 5 を達成' },
-    { id: 'erase3',  name: '消しゴム愛好家', desc: '1回のプレイで残像を3体消す' },
-    { id: 'freeze',  name: '時よ止まれ',     desc: '砂時計で残像を止める' },
-    { id: 'storm',   name: '嵐を越えて',     desc: 'ECHO STORM のループをクリア' },
-    { id: 'nodash',  name: 'ダッシュ封印',   desc: 'ダッシュを使わずに10ループ' },
-    { id: 'score5k', name: '5000点',         desc: '1回のプレイで5,000点' },
-    { id: 'daily',   name: '日課',           desc: 'デイリーチャレンジを遊ぶ' },
-    { id: 'plays10', name: '常連',           desc: '通算10回プレイ' },
-  ];
+  // Skins: body colour plus an optional surface pattern, accessory and eye style.
+  // src: start (owned from the beginning) / shop (bought with shards) / ach / level / login (earned only)
   const SKINS = [
-    { id: 'amber',  name: 'アンバー',     color: '#ffb627', need: null,     hint: 'はじめから' },
-    { id: 'mint',   name: 'ミント',       color: '#5fe3b8', need: 'loop10', hint: '10ループ到達' },
-    { id: 'sakura', name: 'サクラ',       color: '#ff9ec7', need: 'near10', hint: 'ニアミス10回' },
-    { id: 'violet', name: 'バイオレット', color: '#b79bff', need: 'chain5', hint: 'CHAIN 5' },
-    { id: 'lime',   name: 'ライム',       color: '#c6f25e', need: 'loop20', hint: '20ループ到達' },
-    { id: 'gold',   name: 'ゴールド',     color: '#ffd75e', need: 'loop30', hint: '30ループ到達', sparkle: true },
+    { id: 'amber',   name: 'アンバー',     color: '#ffb627', rar: 'N',  src: 'start' },
+    { id: 'sky',     name: 'スカイ',       color: '#6cc6ff', rar: 'N',  src: 'shop', price: 150 },
+    { id: 'peach',   name: 'ピーチ',       color: '#ffb3a0', eyes: 'happy', rar: 'N', src: 'shop', price: 150 },
+    { id: 'lemon',   name: 'レモン',       color: '#ffe66b', pat: 'dots', c2: '#fff7c2', rar: 'N', src: 'shop', price: 200 },
+    { id: 'berry',   name: 'ベリー',       color: '#e2557c', pat: 'dots', c2: '#ffd0dc', rar: 'N', src: 'shop', price: 200 },
+    { id: 'soda',    name: 'ソーダ',       color: '#7fe0ff', pat: 'stripes', c2: '#e9fbff', rar: 'R', src: 'shop', price: 300 },
+    { id: 'matcha',  name: 'マッチャ',     color: '#9ccc6f', acc: 'leaf', rar: 'R', src: 'shop', price: 300 },
+    { id: 'kitty',   name: 'ネコ',         color: '#ffcf8a', acc: 'ears', eyes: 'happy', rar: 'R', src: 'shop', price: 400 },
+    { id: 'choco',   name: 'チョコ',       color: '#8a5a3c', pat: 'dots', c2: '#ffd6e8', eye: '#ffffff', rar: 'R', src: 'shop', price: 400 },
+    { id: 'frog',    name: 'カエル',       color: '#6fd36a', eyes: 'sparkle', rar: 'R', src: 'shop', price: 450 },
+    { id: 'penguin', name: 'ペンギン',     color: '#2b3a55', pat: 'face', c2: '#f4f7fb', rar: 'SR', src: 'shop', price: 700 },
+    { id: 'tiger',   name: 'トラ',         color: '#ff9d2e', pat: 'stripes', c2: '#3b2a1a', acc: 'ears', rar: 'SR', src: 'shop', price: 800 },
+    { id: 'astro',   name: 'アストロ',     color: '#dfe8f5', pat: 'ring', c2: '#6aa8ff', acc: 'antenna', rar: 'SR', src: 'shop', price: 900 },
+    { id: 'neon',    name: 'ネオン',       color: '#39ffd2', pat: 'glow', c2: '#39ffd2', eyes: 'cool', rar: 'SR', src: 'shop', price: 1000 },
+    { id: 'galaxy',  name: 'ギャラクシー', color: '#1d1747', pat: 'galaxy', c2: '#6b4fd8', eye: '#ffffff', rar: 'UR', src: 'shop', price: 1800 },
+    { id: 'mint',    name: 'ミント',       color: '#5fe3b8', rar: 'R',  src: 'ach' },
+    { id: 'sakura',  name: 'サクラ',       color: '#ff9ec7', acc: 'bow', rar: 'R', src: 'ach' },
+    { id: 'lime',    name: 'ライム',       color: '#c6f25e', pat: 'dots', c2: '#8fd13a', rar: 'R', src: 'ach' },
+    { id: 'clover',  name: 'クローバー',   color: '#4fd8a8', acc: 'leaf', eyes: 'happy', rar: 'R', src: 'ach' },
+    { id: 'violet',  name: 'バイオレット', color: '#b79bff', pat: 'ring', c2: '#f1e9ff', rar: 'SR', src: 'ach' },
+    { id: 'gold',    name: 'ゴールド',     color: '#ffd75e', acc: 'crown', rar: 'SR', src: 'ach', sparkle: true },
+    { id: 'ruby',    name: 'ルビー',       color: '#ff4f6d', pat: 'glow', c2: '#ff4f6d', eyes: 'sparkle', rar: 'SR', src: 'ach' },
+    { id: 'phantom', name: 'ファントム',   color: '#c9d6ea', pat: 'checker', c2: '#a8b8d4', eyes: 'sleepy', rar: 'SR', src: 'ach' },
+    { id: 'star',    name: 'スター',       color: '#ffe66b', pat: 'star', c2: '#ff9d2e', eyes: 'sparkle', rar: 'SR', src: 'ach' },
+    { id: 'comet',   name: 'コメット',     color: '#ff7a45', pat: 'gradient', c2: '#ffd75e', acc: 'horn', rar: 'UR', src: 'ach' },
+    { id: 'chrono',  name: 'クロノ',       color: '#ff9ec7', pat: 'rainbow', rar: 'UR', src: 'ach' },
+    { id: 'nova',    name: 'ノヴァ',       color: '#fff3c4', pat: 'glow', c2: '#ffd75e', acc: 'halo', eyes: 'happy', rar: 'UR', src: 'ach' },
+    { id: 'bubble',  name: 'バブル',       color: '#9fd8ff', pat: 'ring', c2: '#ffffff', rar: 'R', src: 'level' },
+    { id: 'ninja',   name: 'ニンジャ',     color: '#3a3f5c', pat: 'band', c2: '#ff6f59', eye: '#ffffff', rar: 'SR', src: 'level' },
+    { id: 'wizard',  name: 'ウィザード',   color: '#7b5cd6', acc: 'hat', eyes: 'sparkle', rar: 'SR', src: 'level' },
+    { id: 'royal',   name: 'ロイヤル',     color: '#5a7bff', pat: 'gradient', c2: '#b79bff', acc: 'crown', rar: 'UR', src: 'level' },
+    { id: 'aurora',  name: 'オーロラ',     color: '#5fe3b8', pat: 'gradient', c2: '#b79bff', acc: 'halo', rar: 'UR', src: 'level' },
+    { id: 'sunrise', name: 'サンライズ',   color: '#ff8f5a', pat: 'gradient', c2: '#ffd75e', eyes: 'happy', rar: 'SR', src: 'login' },
   ];
+  const RARITY = { N: 'ノーマル', R: 'レア', SR: 'スーパーレア', UR: 'ウルトラレア' };
+  const TIERS = [null, ['かんたん', '#9fb6d3'], ['ふつう', '#5fe3b8'], ['むずかしい', '#6cc6ff'], ['とても難しい', '#b79bff'], ['伝説', '#ffb627']];
+  // Achievements: [id, name, description, tier 1-5, shard reward, skin reward or null, progress () => [value, target]]
+  const B = k => Math.max(save.bestRun[k] || 0, liveRun()[k] || 0);
+  const F = k => save.flags[k] ? 1 : 0;
+  const ACH = [
+    ['first',    'はじめの一歩',   'コインを1枚取る',                         1,  20, null,      () => [save.stats.coins, 1]],
+    ['tutorial', '準備完了',       'チュートリアルをクリアする',              1,  20, null,      () => [F('tutorial'), 1]],
+    ['loop5',    'ループ入門',     '1回のプレイで5ループ',                    1,  30, null,      () => [B('loops'), 5]],
+    ['loop10',   '残像使い',       '1回のプレイで10ループ',                   2,  60, 'mint',    () => [B('loops'), 10]],
+    ['loop15',   'ループ職人',     '1回のプレイで15ループ',                   3, 100, null,      () => [B('loops'), 15]],
+    ['loop20',   '因果の外側',     '1回のプレイで20ループ',                   3, 150, 'lime',    () => [B('loops'), 20]],
+    ['loop25',   '時の迷宮',       '1回のプレイで25ループ',                   4, 220, null,      () => [B('loops'), 25]],
+    ['loop30',   'エコーマスター', '1回のプレイで30ループ',                   4, 300, 'gold',    () => [B('loops'), 30]],
+    ['loop40',   '時間の支配者',   '1回のプレイで40ループ',                   5, 500, 'chrono',  () => [B('loops'), 40]],
+    ['score1k',  '1,000点',        '1回のプレイで1,000点',                    1,  30, null,      () => [B('score'), 1000]],
+    ['score3k',  '3,000点',        '1回のプレイで3,000点',                    2,  60, null,      () => [B('score'), 3000]],
+    ['score5k',  '5,000点',        '1回のプレイで5,000点',                    3, 120, null,      () => [B('score'), 5000]],
+    ['score10k', '10,000点',       '1回のプレイで10,000点',                   4, 250, 'ruby',    () => [B('score'), 10000]],
+    ['score20k', '20,000点',       '1回のプレイで20,000点',                   5, 500, 'nova',    () => [B('score'), 20000]],
+    ['near5',    'かすり上手',     '1回のプレイでニアミス5回',                1,  30, null,      () => [B('nears'), 5]],
+    ['near10',   'かすり職人',     '1回のプレイでニアミス10回',               2,  60, 'sakura',  () => [B('nears'), 10]],
+    ['near20',   '紙一重',         '1回のプレイでニアミス20回',               4, 220, 'phantom', () => [B('nears'), 20]],
+    ['phase3',   'すり抜け入門',   '1回のプレイでダッシュすり抜け3回',        2,  50, null,      () => [B('phases'), 3]],
+    ['phase5',   'すり抜け名人',   '1回のプレイでダッシュすり抜け5回',        3, 100, null,      () => [B('phases'), 5]],
+    ['phase10',  '幽体離脱',       '1回のプレイでダッシュすり抜け10回',       4, 220, null,      () => [B('phases'), 10]],
+    ['chain3',   'スピードスター', 'CHAIN 3 を出す',                          2,  50, null,      () => [B('chain'), 3]],
+    ['chain5',   '最短の美学',     'CHAIN 5 を出す',                          3, 120, 'violet',  () => [B('chain'), 5]],
+    ['chain10',  '光速',           'CHAIN 10 を出す',                         5, 450, 'comet',   () => [B('chain'), 10]],
+    ['erase1',   '消しゴム',       '消しゴムで残像を消す',                    1,  20, null,      () => [F('erase'), 1]],
+    ['erase3',   '消しゴム愛好家', '1回のプレイで残像を3体消す',              3, 100, null,      () => [B('erases'), 3]],
+    ['freeze',   '時よ止まれ',     '砂時計で残像を止める',                    2,  40, null,      () => [F('freeze'), 1]],
+    ['storm',    '嵐を越えて',     'ECHO STORM のループをクリア',             3, 100, null,      () => [F('storm'), 1]],
+    ['storm3',   '嵐の王',         '1回のプレイで STORM を3回クリア',         5, 450, null,      () => [B('storms'), 3]],
+    ['nodash',   'ダッシュ封印',   'ダッシュを使わずに10ループ',              4, 250, null,      () => [B('nodash'), 10]],
+    ['crowd',    '残像の群れ',     '残像15体と同時に走る',                    4, 220, null,      () => [B('ghosts'), 15]],
+    ['fast',     '電光石火',       'ループ開始から1秒以内にコインを取る',     3, 100, null,      () => [F('fast'), 1]],
+    ['clutch',   'ギリギリセーフ', '残り0.5秒以内にコインを取る',             3, 100, null,      () => [F('clutch'), 1]],
+    ['daily',    '日課',           'デイリーチャレンジを遊ぶ',                1,  20, null,      () => [save.stats.dailyPlays, 1]],
+    ['daily7',   '皆勤賞',         'デイリーチャレンジを7日遊ぶ',             3, 150, 'clover',  () => [save.stats.dailyDays, 7]],
+    ['streak3',  '三日坊主卒業',   '3日連続でログイン',                       1,  40, null,      () => [save.login.best, 3]],
+    ['streak7',  '習慣の力',       '7日連続でログイン',                       3, 200, null,      () => [save.login.best, 7]],
+    ['plays10',  '常連',           '通算10回プレイ',                          1,  30, null,      () => [save.stats.plays, 10]],
+    ['plays50',  'ベテラン',       '通算50回プレイ',                          2, 100, null,      () => [save.stats.plays, 50]],
+    ['plays100', '百戦錬磨',       '通算100回プレイ',                         3, 200, null,      () => [save.stats.plays, 100]],
+    ['total100', '百ループ',       '通算100ループ',                           2,  80, null,      () => [save.stats.loops, 100]],
+    ['total500', '五百ループ',     '通算500ループ',                           4, 250, null,      () => [save.stats.loops, 500]],
+    ['mission10','がんばり屋',     'デイリーミッションを10個クリア',          2,  80, null,      () => [save.stats.missions, 10]],
+    ['mission30','努力家',         'デイリーミッションを30個クリア',          3, 150, 'star',    () => [save.stats.missions, 30]],
+    ['level10',  'レベル10',       'レベル10になる',                          3, 150, null,      () => [save.level, 10]],
+    ['level25',  'レベル25',       'レベル25になる',                          5, 500, null,      () => [save.level, 25]],
+    ['skins5',   'コレクター',     'スキンを5種類集める',                     2,  80, null,      () => [ownedCount(), 5]],
+    ['skins15',  '大コレクター',   'スキンを15種類集める',                    4, 300, null,      () => [ownedCount(), 15]],
+  ].map(([id, name, desc, tier, shards, skin, prog]) => ({ id, name, desc, tier, shards, skin, prog }));
+  const LEVEL_SKINS = { 5: 'bubble', 10: 'ninja', 15: 'wizard', 20: 'royal', 30: 'aurora' };
+  const levelReward = lv => ({ shards: 30 + lv * 10, skin: LEVEL_SKINS[lv] || null });
+  const LOGIN = [20, 30, 40, 50, 60, 80, 150];
+  // Daily missions: three are drawn per day from this pool; sum = adds up over the day, max = in a single run
+  const MISSION_POOL = [
+    { id: 'loops',  kind: 'sum', key: 'loops',  ns: [8, 12, 20],      rw: [30, 40, 60], text: n => `合計${n}ループする` },
+    { id: 'coins',  kind: 'sum', key: 'coins',  ns: [10, 20, 30],     rw: [30, 40, 60], text: n => `コインを合計${n}枚取る` },
+    { id: 'near',   kind: 'sum', key: 'nears',  ns: [4, 8, 12],       rw: [30, 45, 60], text: n => `ニアミスを合計${n}回` },
+    { id: 'phase',  kind: 'sum', key: 'phases', ns: [2, 4, 6],        rw: [30, 45, 60], text: n => `ダッシュすり抜けを合計${n}回` },
+    { id: 'chain',  kind: 'max', key: 'chain',  ns: [2, 3, 4],        rw: [30, 45, 70], text: n => `CHAIN ${n} を出す` },
+    { id: 'run',    kind: 'max', key: 'loops',  ns: [5, 8, 12],       rw: [30, 45, 70], text: n => `1回のプレイで${n}ループ` },
+    { id: 'score',  kind: 'max', key: 'score',  ns: [1500, 3000, 5000], rw: [30, 45, 70], text: n => `1回のプレイで${fmt(n)}点` },
+    { id: 'plays',  kind: 'sum', key: 'plays',  ns: [3, 5],           rw: [30, 45],     text: n => `${n}回プレイする` },
+    { id: 'daily',  kind: 'sum', key: 'daily',  ns: [1],              rw: [40],         text: () => 'デイリーチャレンジを遊ぶ' },
+    { id: 'erase',  kind: 'sum', key: 'erases', ns: [1, 2],           rw: [40, 60],     text: n => n > 1 ? `消しゴムを合計${n}回使う` : '消しゴムを使う' },
+  ];
+  const MISSION_BONUS = 50;
   const RANKS = [[0, '迷子'], [3, '見習いランナー'], [6, 'ループ慣れ'], [10, '残像使い'], [15, '時間の曲芸師'], [20, '因果の外側'], [30, 'エコーマスター']];
   const rankFor = loops => { let r = RANKS[0][1]; for (const [n, name] of RANKS) if (loops >= n) r = name; return r; };
   const needXp = lv => 60 + lv * 40;
@@ -646,12 +852,14 @@ body.touch .keyhint { display: none; }
   const defaults = () => ({
     best: { endless: 0 },
     daily: { date: '', best: 0, plays: 0 },
-    stats: { plays: 0, loops: 0, coins: 0, nears: 0, phases: 0, ms: 0, dailyPlays: 0 },
-    bestRun: { loops: 0, nears: 0, phases: 0, chain: 0, erases: 0, score: 0, nodash: 0 },
+    stats: { plays: 0, loops: 0, coins: 0, nears: 0, phases: 0, ms: 0, dailyPlays: 0, dailyDays: 0, lastDailyDay: '', missions: 0, shardsEarned: 0 },
+    bestRun: { loops: 0, nears: 0, phases: 0, chain: 0, erases: 0, score: 0, nodash: 0, storms: 0, ghosts: 0 },
     top: { endless: [], daily: [] },
-    ach: {},
-    skin: 'amber',
+    ach: {}, achClaimed: {}, flags: {},
+    skin: 'amber', owned: { amber: 1 }, shards: 0,
     level: 1, xp: 0,
+    missions: { date: '', list: [], bonus: false },
+    login: { last: '', streak: 0, best: 0, total: 0, claimed: '' },
     tutorial: false, howtoSeen: false, tutorialDone: false, tips: {},
     settings: {
       bgm: 0.5, sfx: 0.8, muted: false,
@@ -674,7 +882,15 @@ body.touch .keyhint { display: none; }
       if (raw) {
         const d = JSON.parse(raw);
         merge(s, d);
-        if (d.ach && typeof d.ach === 'object') s.ach = d.ach;
+        for (const k of ['ach', 'achClaimed', 'flags', 'owned']) if (d[k] && typeof d[k] === 'object') s[k] = Object.assign(s[k], d[k]);
+        if (d.ach && !d.achClaimed) {
+          // saves from before rewards existed: skins earned back then stay owned
+          const legacy = { loop10: 'mint', near10: 'sakura', chain5: 'violet', loop20: 'lime', loop30: 'gold' };
+          for (const k in legacy) if (d.ach[k]) s.owned[legacy[k]] = 1;
+          if (d.ach.freeze) s.flags.freeze = 1;
+          if (d.ach.storm) s.flags.storm = 1;
+          if (d.tutorialDone) s.flags.tutorial = 1;
+        }
         if (d.tips && typeof d.tips === 'object') s.tips = d.tips;
         if (d.tutorial && d.tutorialDone === undefined) s.tutorialDone = true;   // players from earlier versions skip the tutorial
         if (!d.bestRun && d.top && Array.isArray(d.top.endless)) for (const r of d.top.endless.concat(d.top.daily || [])) { s.bestRun.loops = Math.max(s.bestRun.loops, r.loops); s.bestRun.score = Math.max(s.bestRun.score, r.score); }
@@ -689,15 +905,9 @@ body.touch .keyhint { display: none; }
   }
   ensureDaily();
   const skinOf = id => SKINS.find(s => s.id === id) || SKINS[0];
-  const skinUnlocked = s => !s.need || !!save.ach[s.need];
-  const PROGRESS = {
-    first: () => [save.stats.coins, 1], loop5: () => [save.bestRun.loops, 5], loop10: () => [save.bestRun.loops, 10],
-    loop20: () => [save.bestRun.loops, 20], loop30: () => [save.bestRun.loops, 30], near10: () => [save.bestRun.nears, 10],
-    phase5: () => [save.bestRun.phases, 5], chain5: () => [save.bestRun.chain, 5], erase3: () => [save.bestRun.erases, 3],
-    freeze: () => [save.ach.freeze ? 1 : 0, 1], storm: () => [save.ach.storm ? 1 : 0, 1], nodash: () => [save.bestRun.nodash, 10],
-    score5k: () => [save.bestRun.score, 5000], daily: () => [save.stats.dailyPlays, 1], plays10: () => [save.stats.plays, 10],
-  };
-
+  const owns = id => !!save.owned[id];
+  const ownedCount = () => SKINS.filter(k => owns(k.id)).length;
+  if (!owns(save.skin)) save.skin = 'amber';
   // ================= seeded randomness (daily runs share coin positions) =================
   function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function mulberry(a) {
@@ -926,15 +1136,17 @@ body.touch .keyhint { display: none; }
     seed = m === 'daily' ? 'daily-' + today() : 'e' + Math.random().toString(36).slice(2);
     ghosts = []; loopN = 1; score = 0; shownScore = 0; chain = 0; killer = null;
     particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false;
-    run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, startLv: save.level, startXp: save.xp };
+    run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, storms: 0, maxGhosts: 0, firstDaily: false, startLv: save.level, startXp: save.xp };
     closeModal(); peekBack.hidden = true;
     stickHint.classList.toggle('gone', save.stats.plays >= 3);
     save.stats.plays++;
-    if (m === 'daily') save.stats.dailyPlays++;
+    if (m === 'daily') {
+      save.stats.dailyPlays++;
+      if (save.stats.lastDailyDay !== today()) { save.stats.lastDailyDay = today(); save.stats.dailyDays++; run.firstDaily = true; }
+    }
     persist();
     showView('game');
-    if (m === 'daily') unlock('daily');
-    if (save.stats.plays >= 10) unlock('plays10');
+    checkAch();
     beginLoop({ x: W / 2, y: W / 2 });
     sfx.start();
     bgmStop(); bgmSet(playLevel(), playTempo()); bgmStart();
@@ -980,13 +1192,15 @@ body.touch .keyhint { display: none; }
     sfx.rewind(); duck(); buzz(15);
     doFlash(0.45);
     save.stats.coins++;
-    unlock('first');
-    if (storm) unlock('storm');
+    if (clearF <= 60) save.flags.fast = 1;
+    if (timeLeft <= 30) save.flags.clutch = 1;
+    if (storm) { save.flags.storm = 1; run.storms++; }
     ghosts.push(makeGhost(rec, loopN));
+    run.maxGhosts = Math.max(run.maxGhosts, ghosts.length);
     nextStart = { x: coin.x, y: coin.y };
     rewindFrom = Math.max(frame, Math.floor(gtime)); rewindT = 0;
     loopN++;
-    checkRunAch();
+    checkAch();
     state = 'rewind';
   }
 
@@ -998,9 +1212,9 @@ body.touch .keyhint { display: none; }
     burst(eraser.x, eraser.y, 14, C.coral, 4);
     popup(p[0], p[1] - 34, '#' + g.n + ' 消去 +50', C.coral, 1.15);
     ghosts.splice(idx, 1);
-    score += 50; eraser = null; run.erases++;
+    score += 50; eraser = null; run.erases++; save.flags.erase = 1;
     shakeBy(9); sfx.erase(); buzz(20);
-    checkRunAch();
+    checkAch();
   }
 
   function doFreeze() {
@@ -1008,7 +1222,8 @@ body.touch .keyhint { display: none; }
     popup(hourglass.x, hourglass.y - 34, 'フリーズ +30', C.ice, 1.1);
     hourglass = null; freezeLeft = FREEZE_FRAMES; score += 30; run.freezes++;
     sfx.freeze(); doFlash(0.25); buzz(20);
-    unlock('freeze');
+    save.flags.freeze = 1;
+    checkAch();
   }
 
   function die(g) {
@@ -1027,21 +1242,21 @@ body.touch .keyhint { display: none; }
     list.push({ score, loops, date: today() });
     list.sort((a, b) => b.score - a.score);
     list.length = Math.min(list.length, 5);
-    const st = save.stats, br = save.bestRun;
+    const st = save.stats, br = save.bestRun, lr = liveRun();
     st.loops += loops; st.nears += run.nears; st.phases += run.phases; st.ms += Math.round(run.frames * STEP);
-    br.loops = Math.max(br.loops, loops); br.nears = Math.max(br.nears, run.nears); br.phases = Math.max(br.phases, run.phases);
-    br.chain = Math.max(br.chain, run.maxChain); br.erases = Math.max(br.erases, run.erases); br.score = Math.max(br.score, score);
-    if (run.dashes === 0) br.nodash = Math.max(br.nodash, loops);
-    // experience: loops count most, score adds a little
+    for (const k in lr) br[k] = Math.max(br[k] || 0, lr[k]);
+    // rewards: shards for every run, XP towards the next level
+    const shardGain = loops * 2 + Math.floor(score / 250) + (run.firstDaily ? 20 : 0);
+    addShards(shardGain);
     const xpGain = loops * 20 + Math.floor(score / 40) + 5;
-    let lv = save.level, xp = save.xp + xpGain, ups = 0;
-    while (xp >= needXp(lv)) { xp -= needXp(lv); lv++; ups++; }
-    save.level = lv; save.xp = xp;
+    const ups = addXp(xpGain);
+    const missionsDone = missionProgress({ loops, coins: loops, nears: run.nears, phases: run.phases, chain: run.maxChain, score, plays: 1, daily: mode === 'daily' ? 1 : 0, erases: run.erases });
     save.tutorial = true;
     persist();
-    checkRunAch();
+    run.done = true;
+    checkAch();
     state = 'result'; revealT = 0; shownScore = score;
-    openModal('result', { isBest, xpGain, ups });
+    openModal('result', { isBest, xpGain, ups: ups.length, shardGain, missionsDone });
     menuMusic();
   }
 
@@ -1168,8 +1383,10 @@ body.touch .keyhint { display: none; }
     const first = !save.tutorialDone;
     save.tutorialDone = true; save.howtoSeen = true;
     let ups = 0, xpGain = 0;
-    if (first) { xpGain = 50; let xp = save.xp + xpGain, lv = save.level; while (xp >= needXp(lv)) { xp -= needXp(lv); lv++; ups++; } save.xp = xp; save.level = lv; }
+    if (first) { xpGain = 50; ups = addXp(xpGain).length; }
+    save.flags.tutorial = 1;
     persist();
+    checkAch();
     openModal('tutdone', { then: tut.then, xpGain, ups });
     menuMusic();
   }
@@ -1225,7 +1442,7 @@ body.touch .keyhint { display: none; }
             g.phased = true; score += 15; run.phases++;
             popup(P.x, P.y - 34, 'すり抜け +15', C.chalk, 1);
             sfx.phase();
-            checkRunAch();
+            checkAch();
           }
         } else {
           if (g.phased && d > R * 2.2) g.phased = false;
@@ -1233,7 +1450,7 @@ body.touch .keyhint { display: none; }
             g.near = 70; score += 25; slow = 8; run.nears++;
             popup(P.x, P.y - 34, 'ニアミス +25', C.chalk, 1);
             sfx.near(); buzz(6);
-            checkRunAch();
+            checkAch();
           }
         }
       }
@@ -1313,36 +1530,154 @@ body.touch .keyhint { display: none; }
     t.className = 'toast';
     t.innerHTML = `<span class="ti">${item[0]}</span><span><small>${item[1]}</small><b>${item[2]}</b></span>`;
     toastsEl.appendChild(t);
+    paintChars(t);
     setTimeout(() => t.classList.add('out'), 2100);
     setTimeout(() => { t.remove(); nextToast(); }, 2450);
   }
 
-  // ================= achievements =================
-  function unlock(id) {
-    if (save.ach[id]) return;
-    const a = ACH.find(x => x.id === id);
-    if (!a) return;
-    save.ach[id] = Date.now();
-    persist();
-    unlockedThisRun.push(a.name);
-    sfx.ach();
-    toast(I.trophy, '実績解除', a.name);
-    const sk = SKINS.find(s => s.need === id);
-    if (sk) toast(I.skin, '新しいスキン', sk.name + ' が使えるようになった');
-  }
-  function checkRunAch() {
-    if (!run) return;
+  // ================= achievements, shards, missions, login =================
+  // values from the run in progress, so achievements can pop mid-run
+  function liveRun() {
+    if (!run || run.done || tut) return {};
     const loops = loopN - 1;
-    if (loops >= 5) unlock('loop5');
-    if (loops >= 10) unlock('loop10');
-    if (loops >= 20) unlock('loop20');
-    if (loops >= 30) unlock('loop30');
-    if (run.nears >= 10) unlock('near10');
-    if (run.phases >= 5) unlock('phase5');
-    if (run.maxChain >= 5) unlock('chain5');
-    if (run.erases >= 3) unlock('erase3');
-    if (loops >= 10 && run.dashes === 0) unlock('nodash');
-    if (score >= 5000) unlock('score5k');
+    return { loops, score, nears: run.nears, phases: run.phases, chain: run.maxChain, erases: run.erases, storms: run.storms, nodash: run.dashes === 0 ? loops : 0, ghosts: run.maxGhosts };
+  }
+  const achDone = a => !!save.ach[a.id];
+  const achClaimable = a => achDone(a) && !save.achClaimed[a.id];
+  function checkAch(quiet) {
+    let changed = false;
+    for (const a of ACH) {
+      if (save.ach[a.id]) continue;
+      const [v, t] = a.prog();
+      if (v < t) continue;
+      save.ach[a.id] = Date.now(); changed = true;
+      if (!quiet) {
+        unlockedThisRun.push(a.name);
+        sfx.ach();
+        toast(I.trophy, '実績達成！  ' + '★'.repeat(a.tier), a.name);
+      }
+    }
+    if (changed) { persist(); updateBadges(); }
+  }
+  function addShards(n) {
+    if (!n) return;
+    save.shards += n; save.stats.shardsEarned += n;
+    const w = $('wallet'), el = $('pShards');
+    if (el) el.textContent = fmt(save.shards);
+    if (w) { w.classList.remove('bump'); void w.offsetWidth; w.classList.add('bump'); }
+  }
+  function grantSkin(id) {
+    if (!id || owns(id)) return false;
+    save.owned[id] = 1;
+    toast(skinIcon(id), '新しいスキン！', skinOf(id).name);
+    return true;
+  }
+  function addXp(n) {
+    const ups = [];
+    let lv = save.level, xp = save.xp + n;
+    while (xp >= needXp(lv)) { xp -= needXp(lv); lv++; ups.push(lv); }
+    save.level = lv; save.xp = xp;
+    for (const L of ups) {
+      const r = levelReward(L);
+      addShards(r.shards);
+      toast(I.up, 'レベルアップ！ Lv.' + L, '報酬 ◆' + r.shards + (r.skin ? ' ＋スキン「' + skinOf(r.skin).name + '」' : ''));
+      grantSkin(r.skin);
+    }
+    return ups;
+  }
+  function claimAch(id) {
+    const a = ACH.find(x => x.id === id);
+    if (!a || !achClaimable(a)) return;
+    save.achClaimed[id] = Date.now();
+    addShards(a.shards);
+    grantSkin(a.skin);
+    sfx.coin(); buzz(12);
+    persist(); checkAch(); updateBadges();
+  }
+
+  // daily missions: three drawn from the pool, the same for everyone on a given date
+  function ensureMissions() {
+    if (save.missions.date === today()) return;
+    const rng = mulberry(hashStr('missions-' + today()));
+    const pool = MISSION_POOL.slice(), list = [];
+    while (list.length < 3) {
+      const m = pool.splice(Math.floor(rng() * pool.length), 1)[0];
+      const k = Math.floor(rng() * m.ns.length);
+      list.push({ pid: m.id, n: m.ns[k], reward: m.rw[k], prog: 0, claimed: false });
+    }
+    save.missions = { date: today(), list, bonus: false };
+    persist();
+  }
+  const missionDef = m => MISSION_POOL.find(p => p.id === m.pid);
+  const missionDone = m => m.prog >= m.n;
+  function missionProgress(r) {
+    ensureMissions();
+    let newly = 0;
+    for (const m of save.missions.list) {
+      const d = missionDef(m), before = missionDone(m), v = r[d.key] || 0;
+      m.prog = d.kind === 'sum' ? m.prog + v : Math.max(m.prog, v);
+      if (!before && missionDone(m)) { newly++; toast(I.target, 'ミッション達成！', d.text(m.n)); }
+    }
+    updateBadges();
+    return newly;
+  }
+  function claimMission(i) {
+    const m = save.missions.list[i];
+    if (!m || m.claimed || !missionDone(m)) return;
+    m.claimed = true;
+    save.stats.missions++;
+    addShards(m.reward); addXp(15);
+    sfx.coin(); buzz(12);
+    persist(); checkAch(); updateBadges();
+  }
+  function claimMissionBonus() {
+    const ms = save.missions;
+    if (ms.bonus || !ms.list.every(m => m.claimed)) return;
+    ms.bonus = true;
+    addShards(MISSION_BONUS);
+    sfx.ach(); buzz(15);
+    persist(); updateBadges();
+  }
+
+  // login bonus: one claim per calendar day; the 7-day calendar keeps cycling, the streak resets on a missed day
+  const dayStr = d => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  function checkLogin() {
+    const L = save.login, t = today();
+    if (L.last === t) return;
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    L.streak = L.last === dayStr(y) ? L.streak + 1 : 1;
+    L.best = Math.max(L.best, L.streak);
+    L.total++; L.last = t;
+    persist(); checkAch(true); updateBadges();
+  }
+  const loginPending = () => save.login.last === today() && save.login.claimed !== today();
+  const loginDay = () => (save.login.total - 1) % 7;
+  function claimLogin() {
+    if (!loginPending()) return;
+    const d = loginDay();
+    save.login.claimed = today();
+    addShards(LOGIN[d]);
+    if (d === 6) grantSkin('sunrise');
+    sfx.ach(); buzz(15);
+    persist(); checkAch(); updateBadges();
+  }
+
+  function claimableCount() {
+    ensureMissions();
+    const ms = save.missions;
+    return ACH.filter(achClaimable).length
+      + ms.list.filter(m => missionDone(m) && !m.claimed).length
+      + (!ms.bonus && ms.list.every(m => m.claimed) ? 1 : 0)
+      + (loginPending() ? 1 : 0);
+  }
+  function updateBadges() {
+    const n = claimableCount();
+    for (const b of tabsEl.children) {
+      if (b.dataset.tab !== 'missions') continue;
+      let badge = b.querySelector('.badge');
+      if (n && !badge) { badge = document.createElement('span'); badge.className = 'badge'; b.appendChild(badge); }
+      if (badge) { if (n) badge.textContent = n; else badge.remove(); }
+    }
   }
 
   // ================= views =================
@@ -1359,6 +1694,8 @@ body.touch .keyhint { display: none; }
     if (view !== 'boot') return;
     initAudio(); sfx.open();
     goHome();
+    checkLogin();
+    if (loginPending()) setTimeout(() => { if (view === 'home' && !modalOpen()) openModal('login'); }, 450);
   }
   function goHome() {
     if (tut) { tut = null; tutUI(false); }
@@ -1367,6 +1704,7 @@ body.touch .keyhint { display: none; }
     showView('home');
     setTab('home', true);
     renderProfile();
+    updateBadges();
     menuMusic();
   }
   vBoot.addEventListener('click', leaveBoot);
@@ -1375,10 +1713,12 @@ body.touch .keyhint { display: none; }
     $('pRank').textContent = rankFor(save.bestRun.loops);
     $('pLv').textContent = 'Lv.' + save.level;
     $('pXp').style.setProperty('--p', Math.round(save.xp / needXp(save.level) * 100) + '%');
+    $('pShards').textContent = fmt(save.shards);
     applyBodyFlags();
+    paintChars(vHome);
   }
 
-  const TABS = [['home', 'ホーム', I.home], ['skins', 'スキン', I.skin], ['ach', '実績', I.trophy], ['records', '記録', I.chart]];
+  const TABS = [['home', 'ホーム', I.home], ['skins', 'スキン', I.skin], ['missions', 'ミッション', I.target], ['records', '記録', I.chart]];
   tabsEl.innerHTML = TABS.map(([id, label, ic]) => `<button class="tab" type="button" data-act="tab" data-tab="${id}"><span class="ic">${ic}</span>${label}</button>`).join('');
   function setTab(t, silent) {
     tab = t;
@@ -1388,22 +1728,58 @@ body.touch .keyhint { display: none; }
     pageEl.className = 'page' + (t === 'home' ? ' page-home' : '') + (silent ? '' : ' page-in');
     pagesEl.scrollTop = keep;
     if (!silent) sfx.tab();
+    paintChars(pageEl);
+    updateBadges();
     const f = pageEl.querySelector('[data-focus]');
     if (f && !isTouch()) f.focus({ preventScroll: true });
   }
 
+  // the skin renderer is shared by the arena and every preview in the menus
+  const charHTML = (id, cls) => `<span class="char cv${cls ? ' ' + cls : ''}" data-skin="${id}"><canvas></canvas></span>`;
+  const skinIcon = id => `<span class="char cv" data-skin="${id}" style="width:26px;height:26px"><canvas></canvas></span>`;
+  const gemRw = n => `<span class="rw"><span class="gem"></span>${fmt(n)}</span>`;
+  function paintChars(root) {
+    const d = Math.min(window.devicePixelRatio || 1, 2);
+    for (const el of (root || document).querySelectorAll('.char.cv')) {
+      const cvs = el.querySelector('canvas'), w = el.clientWidth;
+      if (!cvs || !w) continue;
+      const S = Math.round(w * 1.6 * d);
+      if (cvs.width !== S) cvs.width = cvs.height = S;
+      const g = cvs.getContext('2d');
+      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, S, S);
+      drawSkin(g, S / 2, S / 2, w / 2 * d, skinOf(el.dataset.skin || save.skin), {});
+    }
+  }
+  addEventListener('resize', () => paintChars());
+  function skinHow(sk) {
+    if (sk.src === 'start') return 'はじめから持っている';
+    if (sk.src === 'shop') return 'ショップで ◆' + fmt(sk.price);
+    if (sk.src === 'level') { const lv = Object.keys(LEVEL_SKINS).find(k => LEVEL_SKINS[k] === sk.id); return 'レベル' + lv + 'の報酬'; }
+    if (sk.src === 'login') return 'ログインボーナス7日目の報酬';
+    const a = ACH.find(x => x.skin === sk.id);
+    return a ? '実績「' + a.name + '」' + '★'.repeat(a.tier) + 'の報酬' : '';
+  }
+  let skinSel = null, skinFilter = 'all', misView = 'daily', achFilter = 'all';
+  const untilMidnight = () => { const n = new Date(), m = new Date(n); m.setHours(24, 0, 0, 0); const mins = Math.ceil((m - n) / 60000); return Math.floor(mins / 60) + '時間' + (mins % 60) + '分'; };
+
   const PAGES = {
     home() {
-      ensureDaily();
-      const played = save.daily.plays > 0;
+      ensureDaily(); ensureMissions();
+      const played = save.daily.plays > 0, ms = save.missions.list;
+      const doneN = ms.filter(missionDone).length, claim = claimableCount();
       return `<div class="hero">
-          <div class="hero-stage" aria-hidden="true"><span class="track"></span><span class="echo e3"></span><span class="echo e2"></span><span class="echo e1"></span><span class="char" style="--sw:${skinOf(save.skin).color}"></span></div>
+          <div class="hero-stage" aria-hidden="true"><span class="track"></span><span class="echo e3"></span><span class="echo e2"></span><span class="echo e1"></span>${charHTML(save.skin)}</div>
           <h1 class="logo">エコー<em>ラン</em></h1>
           <p class="sub">敵はぜんぶ、過去のあなた。</p>
         </div>
+        <button class="mstrip" type="button" data-act="tab" data-tab="missions">
+          <span class="ms-ic">${I.target}</span>
+          <span class="ms-text"><b>今日のミッション ${doneN}/3</b><span class="bars">${ms.map(m => `<i style="--p:${Math.min(100, Math.round(m.prog / m.n * 100))}%"></i>`).join('')}</span></span>
+          ${claim ? `<span class="badge">${claim}</span>` : `<span class="ms-go">›</span>`}
+        </button>
         <button class="daily-card" type="button" data-act="daily">
           <span class="dc-icon">${I.cal(new Date().getDate())}</span>
-          <span class="dc-text"><b>デイリーチャレンジ</b><small>${shortDate()} · 全員が同じステージ</small></span>
+          <span class="dc-text"><b>デイリーチャレンジ</b><small>${shortDate()} · ${played ? '全員が同じステージ' : '今日の初回プレイ ◆+20'}</small></span>
           <span class="dc-best"><small>今日のBEST</small><b>${fmt(save.daily.best)}</b></span>
           ${played ? '' : '<span class="badge-new">NEW</span>'}
         </button>
@@ -1413,29 +1789,77 @@ body.touch .keyhint { display: none; }
         </button>`;
     },
     skins() {
-      const cur = skinOf(save.skin);
-      const cells = SKINS.map(s => {
-        const ok = skinUnlocked(s), on = save.skin === s.id;
-        return `<button class="skin-cell" type="button" data-act="skin" data-skin="${s.id}" aria-pressed="${on}" ${ok ? '' : 'disabled'}><span class="char" style="--sw:${s.color}"></span>${s.name}<small>${ok ? (on ? '使用中' : 'タップで装備') : s.hint}</small></button>`;
+      const sel = skinOf(skinSel || save.skin), mine = owns(sel.id), on = save.skin === sel.id;
+      let action;
+      if (on) action = `<button class="btn3d dark wide" type="button" disabled>${I.check}装備中</button>`;
+      else if (mine) action = `<button class="btn3d wide" type="button" data-act="equip" data-skin="${sel.id}">装備する</button>`;
+      else if (sel.src === 'shop') action = save.shards >= sel.price
+        ? `<button class="btn3d wide" type="button" data-act="buy" data-skin="${sel.id}"><span class="gem"></span>${fmt(sel.price)} で購入</button>`
+        : `<button class="btn3d dark wide" type="button" disabled><span class="gem"></span>${fmt(sel.price)}（あと ${fmt(sel.price - save.shards)}）</button>`;
+      else action = `<button class="btn3d dark wide" type="button" data-act="goto-ach">${I.lock}入手方法を見る</button>`;
+      const filters = [['all', 'すべて'], ['owned', '所持'], ['shop', 'ショップ'], ['limited', '限定']];
+      const shown = SKINS.filter(k => skinFilter === 'all' || (skinFilter === 'owned' ? owns(k.id) : skinFilter === 'shop' ? k.src === 'shop' : (k.src !== 'shop' && k.src !== 'start')));
+      const cells = shown.map(k => {
+        const have = owns(k.id), eq = save.skin === k.id;
+        const sub = eq ? '<small class="on">装備中</small>' : have ? '<small>所持</small>' : k.src === 'shop' ? `<small class="price"><span class="gem"></span>${fmt(k.price)}</small>` : '<small>限定</small>';
+        return `<button class="skin-cell${have ? '' : ' locked'}" type="button" data-act="skin" data-skin="${k.id}" aria-pressed="${eq}" data-sel="${k.id === sel.id}"><span class="rar-dot ${k.rar}"></span>${have ? '' : `<span class="lockb">${I.lock}</span>`}${charHTML(k.id)}${k.name}${sub}</button>`;
       }).join('');
       return `<h2>スキン</h2>
-        <div class="card skin-show"><span class="char" style="--sw:${cur.color}"></span><span class="pedestal"></span><b>${cur.name}</b><small>${SKINS.filter(skinUnlocked).length} / ${SKINS.length} 解放済み</small></div>
-        <p class="section-label">コレクション</p>
-        <div class="skin-grid">${cells}</div>`;
+        <div class="card skin-show">${charHTML(sel.id)}<span class="pedestal"></span>
+          <span class="rar ${sel.rar}">${sel.rar} · ${RARITY[sel.rar]}</span>
+          <b>${sel.name}</b>
+          <span class="how">${mine ? '所持しています' : skinHow(sel)}</span>
+          ${action}
+        </div>
+        <div class="segbar" role="group" aria-label="絞り込み">${filters.map(([v, l]) => `<button type="button" data-act="skinfilter" data-val="${v}" aria-pressed="${skinFilter === v}">${l}</button>`).join('')}</div>
+        <p class="section-label">${ownedCount()} / ${SKINS.length} 所持</p>
+        <div class="skin-grid">${cells || '<p class="rank-empty">ここにはまだありません</p>'}</div>`;
     },
-    ach() {
-      const got = ACH.filter(a => save.ach[a.id]).length;
-      const rows = ACH.map(a => {
-        const done = !!save.ach[a.id];
-        const [v, t] = PROGRESS[a.id]();
-        const p = done ? 1 : Math.min(1, v / t);
-        const label = done ? '達成' : `${fmt(Math.min(v, t))} / ${fmt(t)}`;
-        return `<div class="card ach${done ? ' done' : ''}"><span class="medal">${done ? I.trophy : I.lock}</span><div class="ach-head"><b>${a.name}</b><small>${label}</small></div><span class="ach-desc">${a.desc}</span><span class="xpbar" style="grid-column:2"><i style="--p:${Math.round(p * 100)}%"></i></span></div>`;
+    missions() {
+      ensureMissions();
+      const ms = save.missions, achWait = ACH.filter(achClaimable).length;
+      const dailyWait = ms.list.filter(m => missionDone(m) && !m.claimed).length + (!ms.bonus && ms.list.every(m => m.claimed) ? 1 : 0) + (loginPending() ? 1 : 0);
+      const seg = `<div class="segbar" role="group" aria-label="表示">
+        <button type="button" data-act="misview" data-val="daily" aria-pressed="${misView === 'daily'}">デイリー${dailyWait ? `<span class="badge">${dailyWait}</span>` : ''}</button>
+        <button type="button" data-act="misview" data-val="ach" aria-pressed="${misView === 'ach'}">実績${achWait ? `<span class="badge">${achWait}</span>` : ''}</button></div>`;
+      if (misView === 'daily') {
+        const rows = ms.list.map((m, i) => {
+          const d = missionDef(m), done = missionDone(m);
+          const act = m.claimed ? `<span class="claimed-mark">${I.check}受取済</span>` : done ? `<button class="btn3d small" type="button" data-act="claim-mis" data-i="${i}">受け取る</button>` : gemRw(m.reward);
+          return `<div class="card mis${done ? ' done' : ''}${m.claimed ? ' claimed' : ''}"><span class="mi">${done ? I.check : I.target}</span><b>${d.text(m.n)}</b><span class="act">${done && !m.claimed ? gemRw(m.reward) : ''}${act}</span><span class="meta"><span class="xpbar"><i style="--p:${Math.min(100, Math.round(m.prog / m.n * 100))}%"></i></span>${fmt(Math.min(m.prog, m.n))}/${fmt(m.n)}</span></div>`;
+        }).join('');
+        const all = ms.list.every(m => m.claimed);
+        const L = save.login, ld = loginPending() ? loginDay() : (L.total ? (L.total - 1) % 7 : -1);
+        return `<h2>ミッション</h2>${seg}
+          <div class="card mission-head"><span>今日のミッション</span><small>更新まで ${untilMidnight()}</small></div>
+          <div class="ach-list">${rows}</div>
+          <div class="card bonus${ms.bonus ? ' claimed' : ''}"><span class="mi">${I.gift}</span><span><b>3つすべてクリア</b><small>コンプリートボーナス</small></span>
+            ${ms.bonus ? `<span class="claimed-mark">${I.check}受取済</span>` : all ? `<button class="btn3d small" type="button" data-act="claim-bonus">${gemRw(MISSION_BONUS)}</button>` : gemRw(MISSION_BONUS)}</div>
+          <p class="section-label">ログインボーナス · 連続 ${L.streak} 日</p>
+          <div class="card login-strip">${LOGIN.map((v, i) => `<span class="lg${i < ld || (i === ld && !loginPending()) ? ' got' : ''}${i === ld && loginPending() ? ' today' : ''}"><small>${i + 1}日目</small>${i === 6 ? skinIcon('sunrise') : '<span class="gem"></span>'}<b>${v}</b></span>`).join('')}</div>
+          ${loginPending() ? '<button class="btn3d wide" type="button" data-act="login-claim">今日のログインボーナスを受け取る</button>' : ''}`;
+      }
+      const filters = [['all', 'すべて'], ['claim', '受け取り'], ['open', '未達成'], ['done', '達成済']];
+      const order = a => achClaimable(a) ? 0 : !achDone(a) ? 1 : 2;
+      const list = ACH.filter(a => achFilter === 'all' || (achFilter === 'claim' ? achClaimable(a) : achFilter === 'open' ? !achDone(a) : achDone(a)))
+        .sort((a, b) => order(a) - order(b) || (order(a) === 1 ? (b.prog()[0] / b.prog()[1]) - (a.prog()[0] / a.prog()[1]) : 0) || a.tier - b.tier);
+      const rows = list.map(a => {
+        const done = achDone(a), [v, t] = a.prog(), p = done ? 1 : Math.min(1, v / t), [tl, tc] = TIERS[a.tier];
+        const reward = `${gemRw(a.shards)}${a.skin ? `<span class="rw-skin">${skinIcon(a.skin)}${skinOf(a.skin).name}</span>` : ''}`;
+        const act = achClaimable(a) ? `<button class="btn3d small" type="button" data-act="claim-ach" data-id="${a.id}">受け取る</button>` : done ? `<span class="claimed-mark">${I.check}受取済</span>` : '';
+        return `<div class="card ach${done ? ' done' : ''}${done && !achClaimable(a) ? ' claimed' : ''}" style="--tc:${tc}">
+          <span class="medal">${done ? I.trophy : I.lock}</span>
+          <div class="ach-head"><b>${a.name}</b><span class="tier" title="${tl}">${'★'.repeat(a.tier)}<i>${'★'.repeat(5 - a.tier)}</i></span></div>
+          <span class="ach-desc">${a.desc} · <em>${tl}</em></span>
+          <span class="ach-foot"><span class="xpbar"><i style="--p:${Math.round(p * 100)}%"></i></span><small>${done ? '達成' : fmt(Math.min(v, t)) + '/' + fmt(t)}</small></span>
+          <span class="ach-rw">${reward}${act}</span>
+        </div>`;
       }).join('');
-      return `<h2>実績</h2>
-        <div class="card ach-sum"><b>${got}<small class="muted" style="font-size:.9rem"> / ${ACH.length}</small></b><span class="xpbar"><i style="--p:${Math.round(got / ACH.length * 100)}%"></i></span></div>
-        <p class="section-label">一覧</p>
-        <div class="ach-list">${rows}</div>`;
+      const got = ACH.filter(achDone).length;
+      return `<h2>ミッション</h2>${seg}
+        <div class="card ach-sum"><b>${got}<small class="muted" style="font-size:.9rem"> / ${ACH.length}</small></b><span class="xpbar"><i style="--p:${Math.round(got / ACH.length * 100)}%"></i></span>${achWait ? `<span class="pill" style="background:var(--coral);color:#fff">受け取り ${achWait}</span>` : ''}</div>
+        <div class="segbar small" role="group" aria-label="絞り込み">${filters.map(([v, l]) => `<button type="button" data-act="achfilter" data-val="${v}" aria-pressed="${achFilter === v}">${l}</button>`).join('')}</div>
+        <div class="ach-list">${rows || '<p class="rank-empty">ここにはまだありません</p>'}</div>`;
     },
     records() {
       ensureDaily();
@@ -1467,7 +1891,7 @@ body.touch .keyhint { display: none; }
 
   // ================= modal sheets =================
   let modalKind = null, modalOpts = {}, shareText = '';
-  const closableByScrim = { settings: 1, howto: 1, pause: 1 };
+  const closableByScrim = { settings: 1, howto: 1, pause: 1, level: 1, login: 1 };
   let closeTimer = 0;
   const modalOpen = () => !modal.hidden && !modal.classList.contains('closing');
   const cardMode = () => matchMedia('(min-width: 700px) and (min-height: 560px)').matches;
@@ -1487,6 +1911,7 @@ body.touch .keyhint { display: none; }
     sheet.scrollTop = 0;
     if (kind !== 'result') sfx.open();
     AFTER[kind] && AFTER[kind](modalOpts);
+    paintChars(sheet);
     const f = sheet.querySelector('[data-focus]');
     if (f) f.focus({ preventScroll: true });
   }
@@ -1503,34 +1928,57 @@ body.touch .keyhint { display: none; }
   // swipe the sheet down by its top edge (the grey bar and title row) to dismiss it
   const dismissible = () => !!closableByScrim[modalKind];
   let drag = null;
-  sheet.addEventListener('pointerdown', e => {
-    if (!modalOpen() || cardMode()) return;
-    if (e.clientY - sheet.getBoundingClientRect().top > 76) return;
-    if (e.target.closest('button, input, .carousel')) return;
-    drag = { id: e.pointerId, y0: e.clientY, t0: performance.now(), dy: 0, h: sheet.offsetHeight };
-    try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
-    sheet.classList.add('dragging');
-  });
-  sheet.addEventListener('pointermove', e => {
-    if (!drag || e.pointerId !== drag.id) return;
-    let dy = e.clientY - drag.y0;
+  function dragStart(y, fromTop) {
+    drag = { y0: y, t0: performance.now(), dy: 0, h: sheet.offsetHeight, live: fromTop };
+    if (fromTop) sheet.classList.add('dragging');
+  }
+  function dragMove(y) {
+    let dy = y - drag.y0;
     dy = dy < 0 ? dy * 0.15 : dismissible() ? dy : dy * 0.3;   // rubber-band when it cannot close
     drag.dy = dy;
     sheet.style.transform = `translateY(${dy}px)`;
     if (dismissible()) scrim.style.opacity = String(Math.max(0, 1 - dy / drag.h));
-  });
-  const endDrag = e => {
-    if (!drag || e.pointerId !== drag.id) return;
+  }
+  function dragEnd() {
     const d = drag; drag = null;
+    if (!d || !d.live) return;
     sheet.classList.remove('dragging');
     const v = d.dy / Math.max(1, performance.now() - d.t0);
-    if (dismissible() && (d.dy > d.h * 0.28 || (v > 0.55 && d.dy > 40))) { buzz(6); goBack(); return; }
+    if (dismissible() && (d.dy > d.h * 0.25 || (v > 0.5 && d.dy > 36))) { buzz(6); goBack(); return; }
     sheet.classList.add('settle');
     sheet.style.transform = ''; scrim.style.opacity = '';
     setTimeout(() => sheet.classList.remove('settle'), 300);
-  };
-  sheet.addEventListener('pointerup', endDrag);
-  sheet.addEventListener('pointercancel', endDrag);
+  }
+  // touch: grab the top edge, or anywhere once the sheet is scrolled to the top and the finger moves down
+  sheet.addEventListener('touchstart', e => {
+    if (!modalOpen() || cardMode() || e.touches.length > 1) { drag = null; return; }
+    if (e.target.closest('input, textarea, .carousel')) { drag = null; return; }
+    const t = e.touches[0];
+    dragStart(t.clientY, t.clientY - sheet.getBoundingClientRect().top < 80);
+    drag.x0 = t.clientX; drag.top = sheet.scrollTop <= 0;
+  }, { passive: true });
+  sheet.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const t = e.touches[0], dy = t.clientY - drag.y0, dx = t.clientX - drag.x0;
+    if (!drag.live) {
+      if (Math.abs(dx) > Math.abs(dy) || dy < -4) { drag = null; return; }   // sideways or scrolling up: let the page handle it
+      if (dy > 6 && drag.top && sheet.scrollTop <= 0) { drag.live = true; drag.y0 = t.clientY; drag.t0 = performance.now(); sheet.classList.add('dragging'); }
+      else return;
+    }
+    e.preventDefault();
+    dragMove(t.clientY);
+  }, { passive: false });
+  sheet.addEventListener('touchend', dragEnd);
+  sheet.addEventListener('touchcancel', dragEnd);
+  // mouse: drag by the top edge
+  sheet.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse' || !modalOpen() || cardMode()) return;
+    if (e.clientY - sheet.getBoundingClientRect().top > 76 || e.target.closest('button, input, .carousel')) return;
+    dragStart(e.clientY, true); drag.id = e.pointerId;
+    try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  sheet.addEventListener('pointermove', e => { if (drag && drag.id === e.pointerId) dragMove(e.clientY); });
+  sheet.addEventListener('pointerup', e => { if (drag && drag.id === e.pointerId) dragEnd(); });
   scrim.addEventListener('click', () => { if (closableByScrim[modalKind]) goBack(); });
 
   const sheetHead = (title, act) => `<div class="sheet-head"><h2>${title}</h2><button class="roundbtn" type="button" data-act="${act || 'close'}" aria-label="とじる">${I.close}</button></div>`;
@@ -1598,8 +2046,9 @@ body.touch .keyhint { display: none; }
           ${sw('hitbox', '当たり判定を表示')}
           ${document.fullscreenEnabled ? `<div class="srow"><span>全画面表示</span><button class="textbtn" type="button" data-act="fullscreen">${document.fullscreenElement ? '元にもどす' : '全画面にする'}</button></div>` : ''}
         </div>
-        <p class="glabel">練習</p>
+        <p class="glabel">ヘルプ</p>
         <div class="group">
+          <div class="srow"><span>あそびかた<small>ルールとアイテムの説明</small></span><button class="textbtn" type="button" data-act="howto">見る</button></div>
           <div class="srow"><span>チュートリアル<small>操作を一から練習する</small></span><button class="textbtn" type="button" data-act="tutorial">もう一度</button></div>
         </div>
         <p class="glabel">データ</p>
@@ -1635,6 +2084,33 @@ body.touch .keyhint { display: none; }
         <button class="btn3d dark wide" type="button" data-act="home">${I.home}ホームへ</button>
       </div>`;
     },
+    level() {
+      const lv = save.level, need = needXp(lv);
+      const rows = [];
+      for (let L = Math.max(2, lv - 1); L <= Math.max(lv + 10, 31); L++) {
+        if (L > lv + 10 && !LEVEL_SKINS[L]) continue;
+        const r = levelReward(L), got = L <= lv, next = L === lv + 1;
+        rows.push(`<div class="lv-row${got ? ' got' : ''}${next ? ' next' : ''}"><span class="ln">Lv.${L}</span><span class="lv-rw">${gemRw(r.shards)}${r.skin ? `<span class="rw-skin">${skinIcon(r.skin)}${skinOf(r.skin).name}</span>` : ''}</span><span class="lv-st">${got ? I.check : next ? 'つぎ' : ''}</span></div>`);
+      }
+      return `${sheetHead('レベル')}
+        <div class="card lv-head">${charHTML(save.skin)}<div><b>Lv.${lv}</b><small>${rankFor(save.bestRun.loops)}</small><span class="xpbar"><i style="--p:${Math.round(save.xp / need * 100)}%"></i></span><small>つぎのレベルまで あと ${fmt(need - save.xp)} XP</small></div></div>
+        <ul class="tips" style="margin-top:12px">
+          <li><b>XP</b> はプレイするとたまる（1ループ = 20 XP、スコア40点 = 1 XP、ミッション受け取り = 15 XP）。</li>
+          <li>レベルが上がるたびに <b>カケラ</b>、決まったレベルで <b>限定スキン</b> がもらえる。</li>
+        </ul>
+        <p class="glabel">レベル報酬</p>
+        <div class="lv-rows">${rows.join('')}</div>`;
+    },
+    login() {
+      const d = loginDay(), L = save.login;
+      return `<div class="stack center">
+        <p class="eyebrow-s">LOGIN BONUS</p>
+        <h2 class="res-title" style="font-size:clamp(1.6rem,7vw,2.1rem)">ログインボーナス</h2>
+        <p class="muted" style="margin:0;font-weight:800">${L.streak}日連続ログイン中 · 7日目はスキン</p>
+        <div class="login-grid">${LOGIN.map((v, i) => `<span class="lg${i < d ? ' got' : ''}${i === d ? ' today' : ''}${i === 6 ? ' big' : ''}"><small>${i + 1}日目</small>${i === 6 ? skinIcon('sunrise') : '<span class="gem"></span>'}<b>${v}</b></span>`).join('')}</div>
+        <button class="btn3d big wide" type="button" data-act="login-claim" data-focus>${I.gift}受け取る</button>
+      </div>`;
+    },
     result(o) {
       const loops = loopN - 1, rank = rankFor(loops);
       let cause = '時間切れ';
@@ -1652,7 +2128,8 @@ body.touch .keyhint { display: none; }
           <div><small>ニアミス</small><b>${run.nears}</b></div>
           <div><small>すり抜け</small><b>${run.phases}</b></div>
         </div>
-        <div class="res-xp"><span>Lv.<em id="resLv">${lvBefore}</em></span><span class="xpbar"><i id="resXp" style="--p:${Math.round(run.startXp / needXp(lvBefore) * 100)}%"></i></span><span>+${o.xpGain} XP</span></div>
+        <div class="res-gain"><span class="rg">${gemRw(o.shardGain)}<small>カケラ</small></span><span class="rg"><span class="rw">+${o.xpGain}</span><small>XP</small></span>${o.missionsDone ? `<span class="rg"><span class="rw">${o.missionsDone}</span><small>ミッション達成</small></span>` : ''}</div>
+        <div class="res-xp"><span>Lv.<em id="resLv">${lvBefore}</em></span><span class="xpbar"><i id="resXp" style="--p:${Math.round(run.startXp / needXp(lvBefore) * 100)}%"></i></span><span class="muted">${nextLevelSkinText()}</span></div>
         ${o.ups ? '<span class="lvup">LEVEL UP!</span>' : ''}
         ${unlockedThisRun.length ? `<p class="res-unlock">新しい実績 <b>${unlockedThisRun.join('、')}</b></p>` : ''}
         <button class="btn3d big wide" type="button" data-act="retry" data-focus>${I.retry}リトライ</button>
@@ -1700,6 +2177,10 @@ body.touch .keyhint { display: none; }
       }, reduceMotion ? 0 : 1000);
     },
   };
+  function nextLevelSkinText() {
+    const L = Object.keys(LEVEL_SKINS).map(Number).find(n => n > save.level);
+    return L ? `Lv.${L}で「${skinOf(LEVEL_SKINS[L]).name}」` : '';
+  }
   function finishHowto() {
     save.howtoSeen = true; persist();
     closeModal();
@@ -1711,7 +2192,7 @@ body.touch .keyhint { display: none; }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const act = b.dataset.act;
-    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin'].indexOf(act) < 0) sfx.ui();
+    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin', 'level', 'equip', 'buy', 'claim-ach', 'claim-mis', 'claim-bonus', 'login-claim'].indexOf(act) < 0) sfx.ui();
     if (isTouch()) buzz(5);
     switch (act) {
       case 'tab': if (b.dataset.tab !== tab || view !== 'home') setTab(b.dataset.tab); break;
@@ -1727,13 +2208,37 @@ body.touch .keyhint { display: none; }
       case 'settings': openModal('settings', { from: modalKind === 'pause' ? 'pause' : null }); break;
       case 'close': goBack(); break;
       case 'skin': {
-        if (save.skin === b.dataset.skin) break;
-        save.skin = b.dataset.skin; persist(); renderProfile(); setTab('skins', 'keep');
-        const n = pageEl.querySelector(`[data-skin="${save.skin}"]`); if (n) n.focus({ preventScroll: true });
+        // tapping an owned skin equips it; tapping any other skin previews it with how to get it
+        const id = b.dataset.skin;
+        skinSel = id;
+        if (owns(id) && save.skin !== id) { save.skin = id; persist(); renderProfile(); sfx.ach(); buzz(10); }
+        else sfx.ui();
+        setTab('skins', 'keep');
+        const n = pageEl.querySelector(`.skin-cell[data-skin="${id}"]`); if (n) n.focus({ preventScroll: true });
         const c = pageEl.querySelector('.skin-show .char'); if (c) c.classList.add('pop');
-        sfx.ach(); buzz(10);
         break;
       }
+      case 'equip': save.skin = b.dataset.skin; persist(); renderProfile(); setTab('skins', 'keep'); sfx.ach(); { const c = pageEl.querySelector('.skin-show .char'); if (c) c.classList.add('pop'); } break;
+      case 'buy': {
+        const k = skinOf(b.dataset.skin);
+        if (owns(k.id) || save.shards < k.price) break;
+        save.shards -= k.price; save.owned[k.id] = 1; save.skin = k.id;
+        persist(); renderProfile(); checkAch();
+        sfx.ach(); buzz([20, 30, 20]);
+        toast(skinIcon(k.id), '購入しました', k.name + ' を装備');
+        setTab('skins', 'keep');
+        { const c = pageEl.querySelector('.skin-show .char'); if (c) c.classList.add('pop'); }
+        break;
+      }
+      case 'skinfilter': skinFilter = b.dataset.val; setTab('skins', 'keep'); break;
+      case 'goto-ach': misView = 'ach'; achFilter = 'all'; setTab('missions'); break;
+      case 'misview': misView = b.dataset.val; setTab('missions', 'keep'); break;
+      case 'achfilter': achFilter = b.dataset.val; setTab('missions', 'keep'); break;
+      case 'claim-ach': claimAch(b.dataset.id); refreshPage(); break;
+      case 'claim-mis': claimMission(Number(b.dataset.i)); refreshPage(); break;
+      case 'claim-bonus': claimMissionBonus(); refreshPage(); break;
+      case 'login-claim': claimLogin(); if (modalKind === 'login') closeModal(); refreshPage(); break;
+      case 'level': openModal('level'); break;
       case 'ctl': save.settings.control = b.dataset.val; persist(); applyBodyFlags(); for (const x of sheet.querySelectorAll('[data-act="ctl"]')) x.setAttribute('aria-pressed', x.dataset.val === save.settings.control); break;
       case 'fullscreen':
         if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -1744,7 +2249,7 @@ body.touch .keyhint { display: none; }
       case 'share': doShare(b); break;
       case 'reset':
         if (Date.now() - resetArmed < 4000) {
-          save = defaults(); save.howtoSeen = true; save.tutorialDone = true; ensureDaily(); persist(); applyVolumes(); applyBodyFlags(); renderProfile();
+          save = defaults(); save.howtoSeen = true; save.tutorialDone = true; save.flags.tutorial = 1; ensureDaily(); persist(); applyVolumes(); applyBodyFlags(); renderProfile(); updateBadges();
           openModal('settings', modalOpts);
           toast(I.close, 'データ', '記録と実績を消しました');
         } else {
@@ -1754,6 +2259,7 @@ body.touch .keyhint { display: none; }
         break;
     }
   });
+  function refreshPage() { renderProfile(); if (view === 'home') setTab(tab, 'keep'); updateBadges(); }
   peekBack.addEventListener('click', unpeek);
   function unpeek() {
     if (state !== 'result' || peekBack.hidden) return;
@@ -1809,7 +2315,8 @@ body.touch .keyhint { display: none; }
     if (state === 'resuming') { togglePause(); return; }
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
     if (modalKind === 'settings') { if (modalOpts.from === 'pause') openModal('pause'); else closeModal(); return; }
-    if (modalKind === 'howto') { closeModal(); return; }
+    if (modalKind === 'howto' || modalKind === 'level') { closeModal(); return; }
+    if (modalKind === 'login') { claimLogin(); closeModal(); refreshPage(); return; }
     if (modalKind === 'pause') { togglePause(); return; }
     if (modalKind === 'result' || modalKind === 'tutdone') { goHome(); return; }
     if (view === 'home' && tab !== 'home') setTab('home');
@@ -2033,6 +2540,129 @@ body.touch .keyhint { display: none; }
     }
   }
 
+  function starPath(g, x, y, r1, r2, n) {
+    g.beginPath();
+    for (let i = 0; i < n * 2; i++) { const a = -Math.PI / 2 + i * Math.PI / n, rr = i % 2 ? r2 : r1; g.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); }
+    g.closePath();
+  }
+  // draws a player skin centred on (x, y) with body radius r; o.dx/o.dy aim the eyes, o.t animates rainbow skins
+  function drawSkin(g, x, y, r, sk, o) {
+    o = o || {};
+    const t = o.t || 0, c2 = sk.c2 || '#ffffff', TAU = Math.PI * 2;
+    g.save();
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    // accessories that sit behind the head
+    if (sk.acc === 'ears') {
+      for (const s of [-1, 1]) {
+        g.fillStyle = sk.color;
+        g.beginPath(); g.moveTo(x + s * r * 0.2, y - r * 0.86); g.lineTo(x + s * r * 0.92, y - r * 1.18); g.lineTo(x + s * r * 0.88, y - r * 0.32); g.closePath(); g.fill();
+        g.fillStyle = sk.pat === 'stripes' ? c2 : '#ffb3c7';
+        g.beginPath(); g.moveTo(x + s * r * 0.42, y - r * 0.8); g.lineTo(x + s * r * 0.82, y - r * 0.99); g.lineTo(x + s * r * 0.8, y - r * 0.55); g.closePath(); g.fill();
+      }
+    }
+    if (sk.acc === 'horn') {
+      g.fillStyle = c2;
+      g.beginPath(); g.moveTo(x - r * 0.2, y - r * 0.82); g.lineTo(x + r * 0.05, y - r * 1.5); g.lineTo(x + r * 0.22, y - r * 0.8); g.closePath(); g.fill();
+    }
+    // body
+    let fill = sk.color;
+    if (sk.pat === 'rainbow') {
+      const gr = g.createLinearGradient(x - r, y - r, x + r, y + r);
+      for (let i = 0; i <= 6; i++) gr.addColorStop(i / 6, `hsl(${(i * 60 + t * 90) % 360}, 95%, 66%)`);
+      fill = gr;
+    } else if (sk.pat === 'gradient') {
+      const gr = g.createLinearGradient(x, y - r, x, y + r); gr.addColorStop(0, sk.color); gr.addColorStop(1, c2); fill = gr;
+    } else if (sk.pat === 'galaxy') {
+      const gr = g.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r); gr.addColorStop(0, c2); gr.addColorStop(1, sk.color); fill = gr;
+    }
+    if (sk.pat === 'glow') { g.shadowColor = c2; g.shadowBlur = r * 0.9; }
+    g.fillStyle = fill;
+    g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+    g.shadowBlur = 0;
+    // surface patterns, clipped to the body
+    g.save();
+    g.beginPath(); g.arc(x, y, r, 0, TAU); g.clip();
+    g.fillStyle = c2;
+    if (sk.pat === 'stripes') { g.save(); g.translate(x, y); g.rotate(-0.6); for (let k = -3; k <= 3; k++) g.fillRect(k * r * 0.62 - r * 0.14, -r * 1.5, r * 0.28, r * 3); g.restore(); }
+    else if (sk.pat === 'dots') for (const [a, b] of [[-0.55, -0.5], [0.15, -0.72], [0.62, -0.18], [-0.7, 0.3], [0.5, 0.62], [-0.12, 0.74]]) { g.beginPath(); g.arc(x + a * r, y + b * r, r * 0.13, 0, TAU); g.fill(); }
+    else if (sk.pat === 'band') g.fillRect(x - r, y - r * 0.64, r * 2, r * 0.3);
+    else if (sk.pat === 'face') { g.beginPath(); g.ellipse(x, y + r * 0.18, r * 0.66, r * 0.58, 0, 0, TAU); g.fill(); }
+    else if (sk.pat === 'checker') { const q = r * 0.5; for (let i = -2; i < 2; i++) for (let j = -2; j < 2; j++) if ((i + j) & 1) g.fillRect(x + i * q, y + j * q, q, q); }
+    else if (sk.pat === 'ring') { g.strokeStyle = c2; g.lineWidth = r * 0.13; g.beginPath(); g.arc(x, y, r * 0.8, 0, TAU); g.stroke(); }
+    else if (sk.pat === 'galaxy') { g.fillStyle = '#ffffff'; for (const [a, b, z] of [[-0.5, -0.3, 0.05], [0.4, -0.5, 0.04], [0.62, 0.3, 0.06], [-0.3, 0.6, 0.04], [0.15, 0.62, 0.03], [-0.72, 0.1, 0.03], [0.05, -0.75, 0.035]]) { g.beginPath(); g.arc(x + a * r, y + b * r, r * z, 0, TAU); g.fill(); } }
+    else if (sk.pat === 'star') { starPath(g, x + r * 0.5, y + r * 0.45, r * 0.3, r * 0.13, 5); g.fill(); }
+    // light and shade give the body volume
+    const hl = g.createRadialGradient(x - r * 0.35, y - r * 0.42, 0, x - r * 0.35, y - r * 0.42, r * 0.8);
+    hl.addColorStop(0, 'rgba(255,255,255,0.45)'); hl.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = hl; g.fillRect(x - r, y - r, r * 2, r * 2);
+    const sh = g.createLinearGradient(0, y, 0, y + r);
+    sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.16)');
+    g.fillStyle = sh; g.fillRect(x - r, y, r * 2, r);
+    g.restore();
+    // accessories in front
+    if (sk.acc === 'leaf') {
+      g.strokeStyle = '#3f8f3a'; g.lineWidth = r * 0.09;
+      g.beginPath(); g.moveTo(x, y - r * 0.95); g.quadraticCurveTo(x + r * 0.05, y - r * 1.2, x + r * 0.12, y - r * 1.3); g.stroke();
+      g.fillStyle = '#6fd36a';
+      g.beginPath(); g.ellipse(x + r * 0.38, y - r * 1.3, r * 0.32, r * 0.15, -0.45, 0, TAU); g.fill();
+    } else if (sk.acc === 'antenna') {
+      g.strokeStyle = '#c7d3e6'; g.lineWidth = r * 0.08;
+      g.beginPath(); g.moveTo(x + r * 0.2, y - r * 0.95); g.lineTo(x + r * 0.45, y - r * 1.45); g.stroke();
+      g.fillStyle = c2; g.beginPath(); g.arc(x + r * 0.47, y - r * 1.5, r * 0.15, 0, TAU); g.fill();
+    } else if (sk.acc === 'bow') {
+      g.fillStyle = '#ff5c8a';
+      const bx = x + r * 0.55, by = y - r * 0.78;
+      g.beginPath(); g.moveTo(bx, by); g.lineTo(bx - r * 0.42, by - r * 0.26); g.lineTo(bx - r * 0.38, by + r * 0.24); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(bx, by); g.lineTo(bx + r * 0.42, by - r * 0.26); g.lineTo(bx + r * 0.38, by + r * 0.24); g.closePath(); g.fill();
+      g.fillStyle = '#ff9ec7'; g.beginPath(); g.arc(bx, by, r * 0.12, 0, TAU); g.fill();
+    } else if (sk.acc === 'crown') {
+      const y0 = y - r * 0.78, w = r * 0.5;
+      g.fillStyle = '#ffd75e'; g.strokeStyle = '#b97d00'; g.lineWidth = r * 0.05;
+      g.beginPath(); g.moveTo(x - w, y0); g.lineTo(x - w, y0 - r * 0.42); g.lineTo(x - w * 0.5, y0 - r * 0.2); g.lineTo(x, y0 - r * 0.55); g.lineTo(x + w * 0.5, y0 - r * 0.2); g.lineTo(x + w, y0 - r * 0.42); g.lineTo(x + w, y0); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = '#ff4f6d'; g.beginPath(); g.arc(x, y0 - r * 0.14, r * 0.08, 0, TAU); g.fill();
+    } else if (sk.acc === 'halo') {
+      g.strokeStyle = '#fff3a6'; g.lineWidth = r * 0.12; g.shadowColor = '#ffe66b'; g.shadowBlur = r * 0.5;
+      g.beginPath(); g.ellipse(x, y - r * 1.22, r * 0.55, r * 0.16, 0, 0, TAU); g.stroke();
+      g.shadowBlur = 0;
+    } else if (sk.acc === 'hat') {
+      g.fillStyle = '#3b2f7a';
+      g.beginPath(); g.moveTo(x - r * 0.62, y - r * 0.66); g.lineTo(x + r * 0.62, y - r * 0.66); g.lineTo(x + r * 0.3, y - r * 1.75); g.closePath(); g.fill();
+      g.beginPath(); g.ellipse(x, y - r * 0.68, r * 0.85, r * 0.17, 0, 0, TAU); g.fill();
+      g.fillStyle = '#ffd75e'; starPath(g, x + r * 0.05, y - r * 1.05, r * 0.16, r * 0.07, 5); g.fill();
+    }
+    // eyes look where the player is heading
+    // standing still, the eyes rest slightly below centre and look at the viewer
+    const l = Math.hypot(o.dx || 0, o.dy || 0);
+    let ex = 0, ey = 1, off = r * 0.08;
+    if (l > 0.01) { ex = o.dx / l; ey = o.dy / l; off = r * 0.36; }
+    const sp = r * 0.34, ec = sk.eye || '#0d2546';
+    const at = s => [x + ex * off - ey * sp * s, y + ey * off + ex * sp * s];
+    g.fillStyle = ec; g.strokeStyle = ec;
+    if (sk.eyes === 'happy') {
+      g.lineWidth = r * 0.11;
+      for (const s of [-1, 1]) { const [qx, qy] = at(s); g.beginPath(); g.arc(qx, qy + r * 0.07, r * 0.13, Math.PI * 1.15, Math.PI * 1.85); g.stroke(); }
+    } else if (sk.eyes === 'sleepy') {
+      g.lineWidth = r * 0.1;
+      for (const s of [-1, 1]) { const [qx, qy] = at(s); g.beginPath(); g.moveTo(qx - r * 0.13, qy); g.lineTo(qx + r * 0.13, qy); g.stroke(); }
+    } else if (sk.eyes === 'sparkle') {
+      for (const s of [-1, 1]) {
+        const [qx, qy] = at(s);
+        g.fillStyle = ec; g.beginPath(); g.arc(qx, qy, r * 0.21, 0, TAU); g.fill();
+        g.fillStyle = '#ffffff'; g.beginPath(); g.arc(qx - r * 0.07, qy - r * 0.08, r * 0.08, 0, TAU); g.fill();
+      }
+    } else if (sk.eyes === 'cool') {
+      g.fillStyle = '#101a2c';
+      for (const s of [-1, 1]) { const [qx, qy] = at(s); g.beginPath(); if (g.roundRect) g.roundRect(qx - r * 0.2, qy - r * 0.13, r * 0.4, r * 0.26, r * 0.08); else g.rect(qx - r * 0.2, qy - r * 0.13, r * 0.4, r * 0.26); g.fill(); }
+      const [ax, ay] = at(-1), [bx, by] = at(1);
+      g.strokeStyle = '#101a2c'; g.lineWidth = r * 0.07; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke();
+      g.strokeStyle = 'rgba(255,255,255,0.7)'; g.lineWidth = r * 0.05;
+      for (const s of [-1, 1]) { const [qx, qy] = at(s); g.beginPath(); g.moveTo(qx - r * 0.1, qy - r * 0.04); g.lineTo(qx - r * 0.02, qy - r * 0.08); g.stroke(); }
+    } else {
+      for (const s of [-1, 1]) { const [qx, qy] = at(s); g.beginPath(); g.arc(qx, qy, r * 0.17, 0, TAU); g.fill(); }
+    }
+    g.restore();
+  }
+
   function drawGhost(g, gi, opts) {
     const p = ghostAt(g, gi), q = ghostAt(g, gi + 3);
     const isKiller = killer === g && (state === 'dying' || state === 'result');
@@ -2188,7 +2818,7 @@ body.touch .keyhint { display: none; }
         for (let i = 0; i < P.trail.length; i += 2) {
           const a = i / P.trail.length;
           ctx.globalAlpha = a * 0.35;
-          ctx.fillStyle = skin.color;
+          ctx.fillStyle = skin.pat === 'rainbow' ? `hsl(${(tick * 3 + i * 12) % 360}, 95%, 66%)` : skin.color;
           ctx.beginPath(); ctx.arc(P.trail[i], P.trail[i + 1], R * (0.35 + a * 0.5), 0, Math.PI * 2); ctx.fill();
         }
         ctx.globalAlpha = 1;
@@ -2218,13 +2848,11 @@ body.touch .keyhint { display: none; }
           ctx.globalAlpha = 1;
         }
       }
-      ctx.fillStyle = skin.color;
-      ctx.beginPath(); ctx.arc(at.x, at.y, R, 0, Math.PI * 2); ctx.fill();
+      drawSkin(ctx, at.x, at.y, R, skin, { dx: P.vx, dy: P.vy, t: tick / 60 });
       if (P.dash > 0) {
         ctx.strokeStyle = C.chalk; ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(at.x, at.y, R + 3, 0, Math.PI * 2); ctx.stroke();
       }
-      drawEyes(at.x, at.y, P.vx, P.vy, C.deep, R);
       if (save.settings.hitbox && live) {
         ctx.strokeStyle = C.deep; ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.arc(P.x, P.y, HIT / 2, 0, Math.PI * 2); ctx.stroke();
@@ -2345,8 +2973,10 @@ body.touch .keyhint { display: none; }
     requestAnimationFrame(loop);
   }
 
+  checkAch(true);
   renderProfile();
   showView('boot');
+  paintChars(vBoot);
   requestAnimationFrame(loop);
 })();
 </script>
