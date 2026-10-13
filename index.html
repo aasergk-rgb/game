@@ -199,6 +199,40 @@ svg { display: block; }
 .card { background: var(--card); border: 1px solid var(--card-line); border-radius: 20px; box-shadow: 0 5px 0 var(--card-deep); }
 .section-label { margin: 18px 4px 8px; font-size: 0.72rem; font-weight: 800; color: var(--chalk-dim); letter-spacing: 0.08em; }
 
+/* skills */
+.sk-loadout { display: grid; gap: 12px; padding: 12px 14px 14px; }
+.sk-row { display: grid; gap: 6px; }
+.sk-lab { display: flex; align-items: baseline; gap: 8px; font-size: 0.78rem; font-weight: 800; }
+.sk-lab small { font-size: 0.66rem; color: var(--chalk-dim); font-weight: 800; }
+.sk-slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.sk-slots.one { grid-template-columns: minmax(0, 1fr); }
+.sk-slot { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; min-width: 0; min-height: 62px; padding: 7px 4px; border-radius: 12px; border: 2px dashed rgba(234, 241, 248, 0.18); background: none; color: var(--chalk-dim); font-size: 0.66rem; font-weight: 800; line-height: 1.2; text-align: center; cursor: pointer; }
+.sk-slots.one .sk-slot { flex-direction: row; min-height: 46px; gap: 8px; font-size: 0.78rem; }
+.sk-slot span { max-width: 100%; overflow-wrap: anywhere; }
+.sk-slot svg { width: 20px; height: 20px; flex: none; }
+.sk-slot.filled { border: 2px solid transparent; background: rgba(234, 241, 248, 0.08); color: var(--chalk); }
+.sk-slot.filled.active { background: rgba(143, 227, 255, 0.14); }
+.sk-slot.filled.active svg { color: var(--ice); }
+.sk-slot.filled.passive svg { color: var(--amber); }
+.sk-slot.locked { border-style: solid; border-color: rgba(234, 241, 248, 0.08); cursor: default; }
+.skill-list { display: grid; gap: 8px; }
+.skill-card { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 2px solid transparent; border-radius: 16px; background: var(--card); box-shadow: 0 4px 0 var(--card-deep); color: var(--chalk); text-align: left; cursor: pointer; }
+.skill-card .sk-ic { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; background: rgba(255, 182, 39, 0.14); color: var(--amber); }
+.skill-card .sk-ic.active { background: rgba(143, 227, 255, 0.14); color: var(--ice); }
+.skill-card .sk-ic svg { width: 24px; height: 24px; }
+.skill-card .sk-tx { display: grid; gap: 2px; min-width: 0; }
+.skill-card .sk-tx b { font-size: 0.9rem; }
+.skill-card .sk-tx small { font-size: 0.72rem; line-height: 1.4; color: var(--chalk-dim); }
+.skill-card .sk-st { padding: 5px 10px; border-radius: 999px; background: rgba(234, 241, 248, 0.08); font-size: 0.68rem; font-weight: 800; white-space: nowrap; }
+.skill-card.on { border-color: var(--amber); }
+.skill-card.on .sk-st { background: var(--amber); color: var(--bg-1); }
+.skill-card.locked { cursor: default; box-shadow: none; background: rgba(234, 241, 248, 0.04); }
+.skill-card.locked .sk-ic { background: rgba(234, 241, 248, 0.06); color: var(--chalk-dim); }
+.skill-card.locked .sk-tx b { color: var(--chalk-dim); }
+.skill-card:active:not(.locked) { transform: translateY(2px); box-shadow: 0 2px 0 var(--card-deep); }
+.rw-skill { display: inline-flex; align-items: center; gap: 4px; font-size: 0.7rem; font-weight: 800; color: var(--ice); white-space: nowrap; }
+.rw-skill svg { width: 15px; height: 15px; }
+
 /* skins */
 .pages.fixed { overflow: hidden; display: flex; flex-direction: column; }
 .page.page-skins { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: 0; }
@@ -267,7 +301,7 @@ svg { display: block; }
 
 /* tab bar */
 .tabbar { flex: none; padding: 6px 8px calc(6px + var(--safe-b)); background: rgba(6, 19, 38, 0.88); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-top: 1px solid var(--line); }
-.tabs { display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabs { display: grid; grid-template-columns: repeat(5, 1fr); }
 .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 0 4px; border: 0; background: none; cursor: pointer; color: var(--chalk-dim); font-size: 0.66rem; font-weight: 800; }
 .tab .ic { width: 52px; height: 30px; border-radius: 999px; display: grid; place-items: center; transition: background-color 0.2s; }
 .tab svg { width: 24px; height: 24px; }
@@ -320,7 +354,23 @@ body.mousectl .board canvas { cursor: crosshair; }
 .dash.hit span { transform: scale(0.9); }
 body.lefty .stick-hint { left: auto; right: 26px; }
 body.lefty .dash { right: auto; left: 22px; }
-body:not(.touch) .stick-hint, body:not(.touch) .dash { display: none; }
+/* SKILL button: the equipped active skill, charged by coins (the ring fills), sits above DASH */
+.skillbtn {
+  --ready: 0;
+  position: absolute; z-index: 3; right: 40px; bottom: calc(154px + var(--safe-b));
+  width: 76px; height: 76px; padding: 5px; border: 0; border-radius: 50%; cursor: pointer; touch-action: none;
+  background: conic-gradient(var(--ice) calc(var(--ready) * 1turn), rgba(143, 227, 255, 0.16) 0);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+.skillbtn > span { width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; color: var(--ice); background: var(--bg-1); transition: transform 0.07s, background 0.12s, color 0.12s; }
+.skillbtn > span svg { width: 30px; height: 30px; }
+.skillbtn b { position: absolute; left: 50%; bottom: -8px; translate: -50% 0; padding: 1px 8px; border-radius: 999px; background: var(--bg-1); border: 1px solid rgba(143, 227, 255, 0.4); color: var(--ice); font-family: var(--font-mono); font-size: 0.66rem; font-weight: 600; white-space: nowrap; }
+.skillbtn.full > span { background: radial-gradient(circle at 35% 28%, #d4f6ff, var(--ice) 62%); color: var(--bg-1); }
+.skillbtn.full b { background: var(--ice); color: var(--bg-1); }
+.skillbtn.full::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--ice); animation: ring 1.1s ease-out infinite; pointer-events: none; }
+.skillbtn.hit > span { transform: scale(0.9); }
+body.lefty .skillbtn { right: auto; left: 40px; }
+body:not(.touch) .stick-hint, body:not(.touch) .dash, body:not(.touch) .skillbtn { display: none; }
 .keyhint { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font-size: 0.7rem; color: var(--chalk-dim); pointer-events: none; }
 body.touch .keyhint { display: none; }
 .peek-back { position: absolute; z-index: 9; left: 50%; bottom: calc(24px + var(--safe-b)); transform: translateX(-50%); animation: fade 0.25s; }
@@ -742,6 +792,7 @@ body.touch .keyhint { display: none; }
     <div class="stick-hint" id="stickHint">ここを<br>ドラッグ</div>
     <div class="stick" id="stick" hidden><div class="stick-base"></div><div class="stick-knob" id="stickKnob"></div></div>
     <button class="dash" id="dashBtn" type="button" aria-label="ダッシュ"><span>DASH</span></button>
+    <button class="skillbtn" id="skillBtn" type="button" aria-label="スキル" hidden><span id="skillIc"></span><b id="skillN"></b></button>
     <p class="keyhint" id="keyhint"></p>
     <button class="btn3d dark peek-back" id="peekBack" type="button" hidden>結果にもどる</button>
   </section>
@@ -774,7 +825,7 @@ body.touch .keyhint { display: none; }
   const stage = $('stage'), board = $('board'), toastsEl = $('toasts');
   const modal = $('modal'), sheet = $('sheet'), scrim = $('scrim');
   const pageEl = $('page'), pagesEl = $('pages'), tabsEl = $('tabs');
-  const dashBtn = $('dashBtn'), pauseBtn = $('pauseBtn'), stickEl = $('stick'), stickKnob = $('stickKnob'), stickHint = $('stickHint'), peekBack = $('peekBack');
+  const skillBtn = $('skillBtn'), dashBtn = $('dashBtn'), pauseBtn = $('pauseBtn'), stickEl = $('stick'), stickKnob = $('stickKnob'), stickHint = $('stickHint'), peekBack = $('peekBack');
   const hud = { score: $('gScore'), best: $('gBest'), loop: $('gLoop') };
 
   const css = getComputedStyle(document.documentElement);
@@ -810,6 +861,7 @@ body.touch .keyhint { display: none; }
     star: svg('<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>', true),
     lock: svg('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
     up: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
+    bolt: svg('<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>'),
     full: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
     down: svg('<path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 19h14"/>'),
     image: svg('<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 16l-5-5-8 8.5"/>'),
@@ -919,6 +971,9 @@ body.touch .keyhint { display: none; }
     ['shareDaily','デイリー自慢',  'デイリーチャレンジの結果をシェアする',    2,   0, null,      () => [F('shareDaily'), 1]],
     ['shareImage','記念撮影',      '結果を画像で保存・シェアする',            1,   0, null,      () => [F('shareImage'), 1]],
     ['share5',   '宣伝部長',       '通算5回シェアする',                       2,   0, 'idol',    () => [save.stats.shares, 5]],
+    ['skillUse', 'はじめてのスキル', 'アクティブスキルを使う',                1,   0, null,      () => [F('skillUse'), 1]],
+    ['skillLast','九死に一生',     'ラストチャンスで残像に耐える',            3,   0, null,      () => [F('lastChance'), 1]],
+    ['skillAll', 'スキルコンプリート', 'すべてのスキルを解放する',            4,   0, null,      () => [SKILLS.filter(skillOpen).length, SKILLS.length]],
   ].map(([id, name, desc, tier, , skin, prog]) => ({ id, name, desc, tier, shards: TIER_SHARDS[tier], skin, prog }));
   // detail sheet: which series an achievement belongs to, what kind of record it tracks, and a hint
   const SERIES = {
@@ -935,6 +990,7 @@ body.touch .keyhint { display: none; }
     mission: ['ミッション', 'total', 'デイリーミッションは毎日3つ。ミッションタブで受け取るとカウントされる。'],
     level:   ['レベル', 'now', 'プレイやミッションの受け取りで XP がたまる。'],
     share:   ['シェア', 'total', '結果画面や記録タブの「シェア」から、X・LINE などに結果を投稿したり、コピーして送ったりするとカウントされる。'],
+    skill:   ['スキル', 'now', 'レベルを上げると新しいスキルが使えるようになる。スキルタブで装備しよう。アクティブスキルはコインでたまったらボタン（キーボードは E）で発動。'],
     skins:   ['スキン', 'now', 'ショップで買う、実績・レベル報酬・ログインボーナスでもらう、の4通りで集められる。'],
     misc:    ['テクニック', 'flag', ''],
   };
@@ -948,12 +1004,51 @@ body.touch .keyhint { display: none; }
     clutch: 'タイムバーが赤くなってからが勝負。残り0.5秒以内にコインに触れよう。',
   };
   const achSeries = id => {
-    const m = id.match(/^(loop|score|near|phase|chain|erase|storm|daily|streak|plays|total|mission|level|skins|share)/);
+    const m = id.match(/^(loop|score|near|phase|chain|erase|storm|daily|streak|plays|total|mission|level|skins|skill|share)/);
     return m ? (m[1] === 'total' ? 'plays' : m[1]) : 'misc';
   };
   const RECORD_LABEL = { best: '1回のプレイでの最高記録', total: '通算', now: '現在', flag: '達成したかどうか' };
   const LEVEL_SKINS = { 5: 'bubble', 10: 'ninja', 15: 'wizard', 20: 'royal', 30: 'aurora' };
+  // skills open up as the level rises. Passive skills work while they sit in a slot (more slots at higher
+  // levels); the one active skill rides on the SKILL button and charges with coins during a run.
+  const SKILLS = [
+    ['longdash',   'passive',  2, 'ロングダッシュ',   'ダッシュで進む距離が1.4倍',                       0, '<path d="M4 12h11M11 7l5 5-5 5"/><path d="M3 7h3M3 17h3"/>'],
+    ['magnet',     'passive',  3, 'マグネット',       'コインやアイテムを取れる範囲が広がる',             0, '<path d="M6 4v8a6 6 0 0 0 12 0V4"/><path d="M6 8h3M15 8h3"/>'],
+    ['timestop',   'active',   4, 'タイムストップ',   '残像を2秒間止める',                               3, '<circle cx="12" cy="13" r="7.5"/><path d="M12 13V9.5M10 2.5h4M18.5 6.5l1.5-1.5"/>'],
+    ['safestart',  'passive',  6, 'セーフスタート',   'ループ開始直後の無敵時間が0.9秒→1.8秒',           0, '<circle cx="12" cy="12" r="8.5" stroke-dasharray="3.2 3"/><path d="M8.8 12.2l2.2 2.2 4.2-4.6"/>'],
+    ['quick',      'passive',  8, 'クイックチャージ', 'ダッシュの回復が1.4秒→1.0秒',                     0, '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path d="M19.5 4v4.5H15"/>'],
+    ['blink',      'active',   9, 'ブリンク',         '向いている方向へ瞬間移動。とちゅうの残像は関係なし', 2, '<path d="M5 12h3M16 12h3"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v3M12 18v3M5.6 5.6l2 2M16.4 16.4l2 2M18.4 5.6l-2 2M7.6 16.4l-2 2"/>'],
+    ['nearpro',    'passive', 11, 'ニアミス名人',     'ニアミスの判定が広がり、得点が+25→+50',           0, '<circle cx="8.5" cy="12" r="5"/><circle cx="17.5" cy="12" r="3.8" stroke-dasharray="2.4 2.4"/>'],
+    ['timeplus',   'passive', 13, 'タイムプラス',     '制限時間が8秒→10秒',                               0, '<circle cx="11" cy="13" r="7.5"/><path d="M11 9.5V13l2.5 1.8"/><path d="M19.5 2.5v5M17 5h5"/>'],
+    ['shield',     'active',  15, 'シールド',         '3秒間、残像に当たっても平気',                       4, '<path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/>'],
+    ['chainkeep',  'passive', 17, 'チェインキープ',   'CHAINが続く時間が3秒→4.5秒',                       0, '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'],
+    ['erase',      'active',  19, 'イレイズ',         'いちばん近い残像を1体消す',                         5, '<path d="M4.5 15.5l9-9 6 6-6.5 6.5H8.5z"/><path d="M8.5 19H20"/>'],
+    ['lastchance', 'passive', 22, 'ラストチャンス',   '1回のプレイで1度だけ、残像に当たっても耐える',     0, '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>'],
+  ].map(([id, kind, lv, name, desc, charge, ic]) => ({ id, kind, lv, name, desc, charge, ic: svg(ic) }));
+  const PASSIVE_SLOT_LV = [2, 7, 14];
   const levelReward = lv => ({ shards: 5 + lv * 3, skin: LEVEL_SKINS[lv] || null });
+  const skillOf = id => SKILLS.find(k => k.id === id);
+  const skillOpen = k => save.level >= k.lv;
+  const skillsAt = lv => SKILLS.filter(k => k.lv === lv);
+  const passiveSlots = () => PASSIVE_SLOT_LV.filter(l => save.level >= l).length;
+  const newSkills = () => SKILLS.filter(k => k.lv > save.skills.seen && skillOpen(k)).length;
+  // what a run actually gets: only opened skills, and no more passives than there are slots
+  function loadout() {
+    const k = save.skills;
+    const passive = k.passive.map(skillOf).filter(x => x && x.kind === 'passive' && skillOpen(x)).slice(0, passiveSlots());
+    const act = skillOf(k.active);
+    return { passive, active: act && act.kind === 'active' && skillOpen(act) ? act : null };
+  }
+  // newly opened skills go straight into a free slot, once; after that the player's own choice stands
+  function autoEquip() {
+    const k = save.skills;
+    for (const x of SKILLS) {
+      if (x.lv <= k.auto || !skillOpen(x)) continue;
+      if (x.kind === 'active' && !k.active) k.active = x.id;
+      if (x.kind === 'passive' && k.passive.length < passiveSlots() && !k.passive.includes(x.id)) k.passive.push(x.id);
+    }
+    k.auto = Math.max(k.auto, save.level);
+  }
   const LOGIN = [10, 10, 15, 15, 20, 25, 40];
   // Daily missions: three are drawn per day from this pool; sum = adds up over the day, max = in a single run
   const MISSION_POOL = [
@@ -984,6 +1079,7 @@ body.touch .keyhint { display: none; }
     ach: {}, achClaimed: {}, flags: {},
     skin: 'amber', owned: { amber: 1 }, shards: 0,
     level: 1, xp: 0,
+    skills: { passive: [], active: '', seen: 1, auto: 1 },
     missions: { date: '', list: [], bonus: false },
     login: { last: '', streak: 0, best: 0, total: 0, claimed: '' },
     tutorial: false, howtoSeen: false, tutorialDone: false, tips: {},
@@ -1025,6 +1121,7 @@ body.touch .keyhint { display: none; }
     return s;
   }
   let save = loadSave();
+  autoEquip();   // players who were already past a skill's level get it in a free slot
   const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} };
   function ensureDaily() {
     if (save.daily.date !== today()) { save.daily = { date: today(), best: 0, plays: 0 }; save.top.daily = []; }
@@ -1081,8 +1178,8 @@ body.touch .keyhint { display: none; }
     document.body.classList.toggle('lefty', !!save.settings.lefty);
     document.body.classList.toggle('mousectl', save.settings.control === 'mouse');
     $('keyhint').innerHTML = save.settings.control === 'mouse'
-      ? 'マウスの方向へ移動 · <span class="kbd">クリック</span> ダッシュ · <span class="kbd">P</span> 一時停止 · <span class="kbd">R</span> 長押しでリトライ'
-      : '<span class="kbd">WASD</span> <span class="kbd">矢印</span> 移動 · <span class="kbd">Space</span> ダッシュ · <span class="kbd">P</span> 一時停止 · <span class="kbd">R</span> 長押しでリトライ';
+      ? 'マウスの方向へ移動 · <span class="kbd">クリック</span> ダッシュ · <span class="kbd">E</span> スキル · <span class="kbd">P</span> 一時停止 · <span class="kbd">R</span> 長押しでリトライ'
+      : '<span class="kbd">WASD</span> <span class="kbd">矢印</span> 移動 · <span class="kbd">Space</span> ダッシュ · <span class="kbd">E</span> スキル · <span class="kbd">P</span> 一時停止 · <span class="kbd">R</span> 長押しでリトライ';
     for (const el of document.querySelectorAll('#bootChar, #pChar')) el.style.setProperty('--sw', skinOf(save.skin).color);
   }
   if (matchMedia('(pointer: coarse)').matches) document.body.classList.add('touch');
@@ -1235,7 +1332,14 @@ body.touch .keyhint { display: none; }
   let banner = null, hint = null, tut = null, run = null, unlockedThisRun = [];
   let particles = [], popups = [];
   let shake = 0, flash = 0, slow = 0, hitstop = 0, tick = 0, readyPulse = 0, retryHold = 0;
-  const P = { x: W / 2, y: W / 2, vx: 0, vy: 0, dash: 0, cd: 0, dx: 0, dy: 1, trail: [] };
+  const P = { x: W / 2, y: W / 2, vx: 0, vy: 0, dash: 0, cd: 0, inv: 0, dx: 0, dy: 1, trail: [] };
+  // skill effects in a run (none in the tutorial)
+  const has = id => !tut && !!run && !!run.sk && run.sk.has(id);
+  const dashCd = () => has('quick') ? 60 : DASH_CD;
+  const grabR = () => R + (has('magnet') ? 46 : 22);
+  const limit = () => has('timeplus') ? 600 : LIMIT;
+  const fastClear = () => has('chainkeep') ? 270 : FAST_CLEAR;
+  const grace = () => has('safestart') ? 108 : GRACE;
 
   function ghostAt(g, f) {
     const L = g.len;
@@ -1273,8 +1377,11 @@ body.touch .keyhint { display: none; }
     ensureDaily();
     seed = m === 'daily' ? 'daily-' + today() : 'e' + Math.random().toString(36).slice(2);
     ghosts = []; loopN = 1; score = 0; shownScore = 0; chain = 0; killer = null;
-    particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false;
+    particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false; skillQueued = false;
     run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, storms: 0, maxGhosts: 0, firstDaily: false, startLv: save.level, startXp: save.xp };
+    const lo = loadout();
+    run.sk = new Set(lo.passive.map(k => k.id)); run.act = lo.active; run.charge = 0; run.lastChance = run.sk.has('lastchance');
+    skillBtnSetup();
     closeModal(); peekBack.hidden = true;
     stickHint.classList.toggle('gone', save.stats.plays >= 3);
     save.stats.plays++;
@@ -1292,12 +1399,12 @@ body.touch .keyhint { display: none; }
 
   function beginLoop(s) {
     rec = []; frame = 0; gtime = 0; freezeLeft = 0;
-    P.x = s.x; P.y = s.y; P.vx = P.vy = 0; P.dash = 0; P.trail = [];
+    P.x = s.x; P.y = s.y; P.vx = P.vy = 0; P.dash = 0; P.inv = 0; P.trail = [];
     storm = loopN >= 10 && loopN % 5 === 0;
     coin = pickSpot(rngFor(loopN, 'coin'), s, 360, []);
     eraser = (loopN % 4 === 0 && ghosts.length >= 3) ? pickSpot(rngFor(loopN, 'erase'), s, 220, [coin]) : null;
     hourglass = (loopN >= 6 && loopN % 6 === 0 && ghosts.length >= 3) ? pickSpot(rngFor(loopN, 'freeze'), s, 200, eraser ? [coin, eraser] : [coin]) : null;
-    graceLeft = GRACE; timeLeft = LIMIT;
+    graceLeft = grace(); timeLeft = limit();
     for (const g of ghosts) { g.near = 0; g.phased = false; }
     const subs = [];
     if (storm) subs.push('残像が1.5倍速');
@@ -1318,7 +1425,8 @@ body.touch .keyhint { display: none; }
 
   function collect() {
     const clearF = frame;
-    chain = clearF <= FAST_CLEAR ? chain + 1 : 0;
+    chain = clearF <= fastClear() ? chain + 1 : 0;
+    if (run.act && run.charge < run.act.charge && ++run.charge === run.act.charge) { popup(coin.x, coin.y - 108, 'SKILL READY', C.ice, 0.95); sfx.ready(); }
     run.maxChain = Math.max(run.maxChain, chain);
     const mult = 1 + Math.min(chain, 8) * 0.25;
     const gain = Math.round((100 + Math.ceil(timeLeft / 60) * 10) * mult);
@@ -1361,6 +1469,44 @@ body.touch .keyhint { display: none; }
     hourglass = null; freezeLeft = FREEZE_FRAMES; score += 30; run.freezes++;
     sfx.freeze(); doFlash(0.25); buzz(20);
     save.flags.freeze = 1;
+    checkAch();
+  }
+
+  function useSkill() {
+    const k = run && run.act;
+    if (tut || !k) return;
+    if (run.charge < k.charge) { popup(P.x, P.y - 34, `チャージ ${run.charge}/${k.charge}`, C.dim, 0.85); sfx.tick(); return; }
+    if (k.id === 'erase' && !ghosts.length) { popup(P.x, P.y - 34, '消せる残像がいない', C.dim, 0.85); return; }
+    run.charge = 0; run.skillUses = (run.skillUses || 0) + 1; save.flags.skillUse = 1;
+    const col = C.ice;
+    if (k.id === 'timestop') {
+      freezeLeft = Math.max(freezeLeft, 120);
+      burst(P.x, P.y, 24, col, 6); popup(P.x, P.y - 34, 'タイムストップ', col, 1.1); sfx.freeze();
+    } else if (k.id === 'blink') {
+      const fx = P.x, fy = P.y;
+      P.x = clamp(P.x + P.dx * 230, R, W - R); P.y = clamp(P.y + P.dy * 230, R, W - R);
+      P.inv = Math.max(P.inv, 20); P.trail = [];
+      burst(fx, fy, 16, C.chalk, 4); burst(P.x, P.y, 24, col, 6);
+      popup(P.x, P.y - 34, 'ブリンク', col, 1); sfx.dash();
+    } else if (k.id === 'shield') {
+      P.inv = Math.max(P.inv, 180);
+      burst(P.x, P.y, 24, col, 5); popup(P.x, P.y - 34, 'シールド 3秒', col, 1.1); sfx.phase();
+    } else if (k.id === 'erase') {
+      const gi = Math.floor(gtime);
+      let idx = 0, best = Infinity;
+      ghosts.forEach((g, i) => { const p = ghostAt(g, gi), d = Math.hypot(p[0] - P.x, p[1] - P.y); if (d < best) { best = d; idx = i; } });
+      const g = ghosts[idx], p = ghostAt(g, gi);
+      burst(p[0], p[1], 34, C.coral, 7); popup(p[0], p[1] - 34, '#' + g.n + ' 消去', C.coral, 1.1);
+      ghosts.splice(idx, 1); shakeBy(8); sfx.erase();
+    }
+    doFlash(0.2); buzz(15);
+    checkAch();
+  }
+  function lastChance() {
+    run.lastChance = false; P.inv = 75; save.flags.lastChance = 1;
+    shakeBy(16); doFlash(0.45); hitstop = 6;
+    burst(P.x, P.y, 30, C.coral, 6); popup(P.x, P.y - 40, 'ラストチャンス！', C.coral, 1.2);
+    sfx.erase(); buzz([40, 30, 40]);
     checkAch();
   }
 
@@ -1432,8 +1578,9 @@ body.touch .keyhint { display: none; }
     mode = 'tutorial'; seed = 'tutorial';
     tut = { step: 0, then: then || null, delay: 0, moved: 0, last: null, start: null };
     ghosts = []; loopN = 1; score = 0; shownScore = 0; chain = 0; killer = null;
-    particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false;
+    particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false; skillQueued = false;
     run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, startLv: save.level, startXp: save.xp };
+    skillBtnSetup();
     closeModal(); peekBack.hidden = true;
     stickHint.classList.remove('gone');
     showView('game');
@@ -1448,7 +1595,7 @@ body.touch .keyhint { display: none; }
     state = 'play'; frame = 0; gtime = 0; rec = []; freezeLeft = 0; storm = false;
     eraser = null; hourglass = null; banner = null; hint = null; coin = null;
     timeLeft = LIMIT; graceLeft = 0;
-    P.vx = P.vy = 0; P.dash = 0; P.cd = 0; P.trail = [];
+    P.vx = P.vy = 0; P.dash = 0; P.cd = 0; P.inv = 0; P.trail = [];
     if (step === 1) { P.x = 500; P.y = 620; tut.moved = 0; }
     if (step === 2) { coin = { x: P.x < 500 ? 780 : 220, y: P.y < 600 ? 800 : 420 }; }
     if (step === 3) {
@@ -1541,7 +1688,7 @@ body.touch .keyhint { display: none; }
       const dx = mouse.x - P.x, dy = mouse.y - P.y, d = Math.hypot(dx, dy);
       if (d > 4) { P.dx = dx / d; P.dy = dy / d; }
     }
-    P.dash = DASH_FRAMES; P.cd = DASH_CD; run.dashes++;
+    P.dash = has('longdash') ? 13 : DASH_FRAMES; P.cd = dashCd(); run.dashes++;
     sfx.dash(); burst(P.x, P.y, 10, C.chalk, 3); buzz(8);
   }
 
@@ -1553,6 +1700,8 @@ body.touch .keyhint { display: none; }
     if (dashQueued) { dashBuf = DASH_BUFFER; dashQueued = false; }
     if (tut && tut.step === 1) dashBuf = 0;
     if (dashBuf > 0) { if (P.cd <= 0) { triggerDash(); dashBuf = 0; } else dashBuf--; }
+    if (skillQueued) { skillQueued = false; useSkill(); }
+    if (P.inv > 0) P.inv--;
 
     if (P.dash > 0) {
       P.vx = P.dx * SPEED * DASH_MUL; P.vy = P.dy * SPEED * DASH_MUL; P.dash--;
@@ -1574,9 +1723,14 @@ body.touch .keyhint { display: none; }
       const gi = Math.floor(gtime);
       for (const g of ghosts) {
         if (g.near > 0) g.near--;
+        if (P.inv > 0) continue;   // shield, blink or last chance: ghosts pass through harmlessly
         const gp = ghostAt(g, gi), d = Math.hypot(gp[0] - P.x, gp[1] - P.y);
         if (d < HIT) {
-          if (!phasing) { if (tut) { tutFail(); return; } die(g); return; }
+          if (!phasing) {
+            if (tut) { tutFail(); return; }
+            if (run.lastChance) { lastChance(); continue; }
+            die(g); return;
+          }
           if (!g.phased) {
             g.phased = true; score += 15; run.phases++;
             popup(P.x, P.y - 34, 'すり抜け +15', C.chalk, 1);
@@ -1585,9 +1739,10 @@ body.touch .keyhint { display: none; }
           }
         } else {
           if (g.phased && d > R * 2.2) g.phased = false;
-          if (!tut && !phasing && d >= R * 2 && d < NEAR && g.near <= 0) {
-            g.near = 70; score += 25; slow = 8; run.nears++;
-            popup(P.x, P.y - 34, 'ニアミス +25', C.chalk, 1);
+          if (!tut && !phasing && d >= R * 2 && d < (has('nearpro') ? NEAR + 16 : NEAR) && g.near <= 0) {
+            const pts = has('nearpro') ? 50 : 25;
+            g.near = 70; score += pts; slow = 8; run.nears++;
+            popup(P.x, P.y - 34, 'ニアミス +' + pts, C.chalk, 1);
             sfx.near(); buzz(6);
             checkAch();
           }
@@ -1611,9 +1766,9 @@ body.touch .keyhint { display: none; }
     timeLeft--;
     if (timeLeft > 0 && timeLeft <= 180 && timeLeft % 60 === 0) sfx.tick();
     if (timeLeft <= 0) { die(null); return; }
-    if (eraser && dist(P, eraser) < R + 22) doErase();
-    if (hourglass && dist(P, hourglass) < R + 22) doFreeze();
-    if (dist(P, coin) < R + 22) collect();
+    if (eraser && dist(P, eraser) < grabR()) doErase();
+    if (hourglass && dist(P, hourglass) < grabR()) doFreeze();
+    if (dist(P, coin) < grabR()) collect();
   }
 
   function step() {
@@ -1721,8 +1876,30 @@ body.touch .keyhint { display: none; }
       addShards(r.shards);
       toast(I.up, 'レベルアップ！ Lv.' + L, '報酬 ◆' + r.shards + (r.skin ? ' ＋スキン「' + skinOf(r.skin).name + '」' : ''));
       grantSkin(r.skin);
+      for (const k of skillsAt(L)) toast(k.ic, '新しいスキル！', `「${k.name}」${k.desc}`);
+      if (PASSIVE_SLOT_LV.includes(L) && L > PASSIVE_SLOT_LV[0]) toast(I.bolt, 'スキル枠が増えた', `パッシブスキルを${passiveSlots()}つ装備できる`);
     }
+    if (ups.length) { autoEquip(); updateBadges(); }
     return ups;
+  }
+  function toggleSkill(id) {
+    const k = skillOf(id), eq = save.skills;
+    if (!k) return;
+    if (!skillOpen(k)) { toast(I.lock, k.name, `Lv.${k.lv} で使えるようになる`); sfx.ui(); return; }
+    // drop anything stale before counting slots
+    const lo = loadout();
+    eq.passive = lo.passive.map(x => x.id); eq.active = lo.active ? lo.active.id : '';
+    if (k.kind === 'active') eq.active = eq.active === id ? '' : id;
+    else if (eq.passive.includes(id)) eq.passive = eq.passive.filter(x => x !== id);
+    else {
+      if (eq.passive.length >= passiveSlots()) {
+        const out = skillOf(eq.passive.shift());
+        toast(k.ic, '入れ替えました', `${out.name} → ${k.name}`);
+      }
+      eq.passive.push(id);
+    }
+    persist(); sfx.ui(); buzz(8);
+    setTab('skill', 'keep');
   }
   function claimAch(id) {
     const a = ACH.find(x => x.id === id);
@@ -1810,9 +1987,8 @@ body.touch .keyhint { display: none; }
       + (loginPending() ? 1 : 0);
   }
   function updateBadges() {
-    const n = claimableCount();
     for (const b of tabsEl.children) {
-      if (b.dataset.tab !== 'missions') continue;
+      const n = b.dataset.tab === 'missions' ? claimableCount() : b.dataset.tab === 'skill' ? newSkills() : 0;
       let badge = b.querySelector('.badge');
       if (n && !badge) { badge = document.createElement('span'); badge.className = 'badge'; b.appendChild(badge); }
       if (badge) { if (n) badge.textContent = n; else badge.remove(); }
@@ -1857,7 +2033,7 @@ body.touch .keyhint { display: none; }
     paintChars(vHome);
   }
 
-  const TABS = [['home', 'ホーム', I.home], ['skins', 'スキン', I.skin], ['missions', 'ミッション', I.target], ['records', '記録', I.chart]];
+  const TABS = [['home', 'ホーム', I.home], ['skins', 'スキン', I.skin], ['skill', 'スキル', I.bolt], ['missions', 'ミッション', I.target], ['records', '記録', I.chart]];
   tabsEl.innerHTML = TABS.map(([id, label, ic]) => `<button class="tab" type="button" data-act="tab" data-tab="${id}"><span class="ic">${ic}</span>${label}</button>`).join('');
   function setTab(t, silent) {
     tab = t;
@@ -1962,6 +2138,33 @@ body.touch .keyhint { display: none; }
           <p class="section-label">${ownedCount()} / ${SKINS.length} 所持</p>
           <div class="skin-grid">${cells || '<p class="rank-empty">ここにはまだありません</p>'}</div>
         </div>`;
+    },
+    skill() {
+      if (save.skills.seen < save.level) { save.skills.seen = save.level; persist(); }
+      const lo = loadout(), slots = passiveSlots();
+      const slot = (k, kind) => k
+        ? `<button class="sk-slot filled ${kind}" type="button" data-act="skill-eq" data-id="${k.id}" aria-label="${k.name}を外す">${k.ic}<span>${k.name}</span></button>`
+        : `<span class="sk-slot">空き</span>`;
+      const pass = [0, 1, 2].map(i => i < slots ? slot(lo.passive[i], 'passive') : `<span class="sk-slot locked">${I.lock}<span>Lv.${PASSIVE_SLOT_LV[i]}</span></span>`).join('');
+      const act = skillOpen(SKILLS.find(k => k.kind === 'active')) ? slot(lo.active, 'active') : `<span class="sk-slot locked">${I.lock}<span>Lv.4 で解放</span></span>`;
+      const card = k => {
+        const open = skillOpen(k), on = lo.active === k || lo.passive.includes(k);
+        const desc = k.desc + (k.charge ? ` · コイン${k.charge}枚でたまる` : '');
+        return `<button class="skill-card${on ? ' on' : ''}${open ? '' : ' locked'}" type="button" data-act="skill-eq" data-id="${k.id}" aria-pressed="${on}">
+          <span class="sk-ic ${k.kind}">${open ? k.ic : I.lock}</span>
+          <span class="sk-tx"><b>${k.name}</b><small>${desc}</small></span>
+          <span class="sk-st">${!open ? 'Lv.' + k.lv : on ? '装備中' : '装備'}</span></button>`;
+      };
+      return `<h2>スキル</h2>
+        <div class="card sk-loadout">
+          <div class="sk-row"><span class="sk-lab">アクティブ<small>${isTouch() ? 'SKILL ボタンで発動' : 'E キーで発動'}</small></span><div class="sk-slots one">${act}</div></div>
+          <div class="sk-row"><span class="sk-lab">パッシブ<small>${slots} / 3 枠 · タップで外す</small></span><div class="sk-slots">${pass}</div></div>
+        </div>
+        <p class="section-label">アクティブスキル · コインでたまったら${isTouch() ? ' SKILL ボタン' : ' E キー'}で発動</p>
+        <div class="skill-list">${SKILLS.filter(k => k.kind === 'active').map(card).join('')}</div>
+        <p class="section-label">パッシブスキル · 装備しているあいだ効果が続く</p>
+        <div class="skill-list">${SKILLS.filter(k => k.kind === 'passive').map(card).join('')}</div>
+        <p class="muted" style="font-size:.74rem;margin:14px 4px 0">スキルはレベルが上がると増えていく。パッシブの枠は Lv.${PASSIVE_SLOT_LV.join(' / ')} で開く。</p>`;
     },
     missions() {
       ensureMissions();
@@ -2148,6 +2351,8 @@ body.touch .keyhint { display: none; }
         SCENE(`<path d="M40 50L130 50" stroke="#4fd8a8" stroke-width="5" stroke-linecap="round"/><text x="85" y="34" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="12" fill="#4fd8a8">最短 ◎</text><path d="M170 50C200 140 210 10 240 110S280 40 270 60" fill="none" stroke="#ff6f59" stroke-width="5" stroke-linecap="round"/><text x="225" y="148" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="12" fill="#ff6f59">寄り道 ×</text><text x="85" y="110" text-anchor="middle" font-family="sans-serif" font-weight="800" font-size="22" fill="#ffb627">CHAIN ×2</text>`)],
       ['アイテムとSTORM', '<b>消しゴム</b>は一番長い残像を消す。<b>砂時計</b>は残像を2.5秒止める。<b>STORM</b>では残像が1.5倍速。',
         SCENE(`<circle cx="70" cy="70" r="20" fill="#ff6f59"/><path d="M62 62l16 16M78 62L62 78" stroke="#0d2546" stroke-width="4" stroke-linecap="round"/><path d="M136 46h28l-14 24zM136 94h28l-14-24z" fill="#8fe3ff"/><path d="M236 44l-18 28h13l-5 22 22-30h-13z" fill="#ff6f59"/><g font-family="sans-serif" font-weight="800" font-size="12" text-anchor="middle" fill="#eaf1f8"><text x="70" y="124">消しゴム</text><text x="150" y="124">砂時計</text><text x="230" y="124">STORM</text></g>`)],
+      ['レベルでスキル解放', `レベルが上がると<b>スキル</b>が増える。<b>パッシブ</b>は装備するだけで効果が続き、<b>アクティブ</b>はコインでたまったら${touch ? '<b>SKILL</b>ボタン' : '<b>E</b>キー'}で発動。`,
+        SCENE(`<circle cx="92" cy="80" r="40" fill="#0d2546" stroke="#8fe3ff" stroke-width="7" stroke-dasharray="168 84" transform="rotate(-90 92 80)"/><path d="M95 60L80 84h11l-3 18 16-24H93z" fill="#8fe3ff"/><text x="92" y="140" text-anchor="middle" font-family="monospace" font-weight="700" font-size="13" fill="#8fe3ff">2/3</text><g font-family="sans-serif" font-weight="800" font-size="13" fill="#eaf1f8"><text x="160" y="58">Lv.2 ロングダッシュ</text><text x="160" y="84">Lv.4 タイムストップ</text><text x="160" y="110" fill="#9fb6d3">Lv.9 ブリンク…</text></g>`)],
       ['操作', touch
         ? '画面の<b>どこでもドラッグ</b>で移動（指を置いた場所がスティックの中心）。<b>DASH</b>ボタンでダッシュ。2本目の指でタップしてもダッシュ。'
         : '<b>WASD・矢印キー</b>で移動、<b>Space</b>でダッシュ、<b>P</b>で一時停止、<b>R長押し</b>でリトライ。設定で「マウス追従」も選べる。',
@@ -2279,15 +2484,17 @@ body.touch .keyhint { display: none; }
       const lv = save.level, need = needXp(lv);
       const rows = [];
       for (let L = Math.max(2, lv - 1); L <= Math.max(lv + 10, 31); L++) {
-        if (L > lv + 10 && !LEVEL_SKINS[L]) continue;
+        if (L > lv + 10 && !LEVEL_SKINS[L] && !skillsAt(L).length) continue;
         const r = levelReward(L), got = L <= lv, next = L === lv + 1;
-        rows.push(`<div class="lv-row${got ? ' got' : ''}${next ? ' next' : ''}"><span class="ln">Lv.${L}</span><span class="lv-rw">${gemRw(r.shards)}${r.skin ? `<button class="rw-skin linkish" type="button" data-act="view-skin" data-skin="${r.skin}">${skinIcon(r.skin)}${skinOf(r.skin).name} ›</button>` : ''}</span><span class="lv-st">${got ? I.check : next ? 'つぎ' : ''}</span></div>`);
+        const sk = skillsAt(L).map(k => `<button class="rw-skill linkish" type="button" data-act="goto-skill">${k.ic}${k.name} ›</button>`).join('')
+          + (PASSIVE_SLOT_LV.includes(L) && L > PASSIVE_SLOT_LV[0] ? `<span class="rw-skill">${I.bolt}スキル枠+1</span>` : '');
+        rows.push(`<div class="lv-row${got ? ' got' : ''}${next ? ' next' : ''}"><span class="ln">Lv.${L}</span><span class="lv-rw">${gemRw(r.shards)}${sk}${r.skin ? `<button class="rw-skin linkish" type="button" data-act="view-skin" data-skin="${r.skin}">${skinIcon(r.skin)}${skinOf(r.skin).name} ›</button>` : ''}</span><span class="lv-st">${got ? I.check : next ? 'つぎ' : ''}</span></div>`);
       }
       return `${sheetHead('レベル')}
         <div class="card lv-head">${charHTML(save.skin)}<div><b>Lv.${lv}</b><small>${rankFor(save.bestRun.loops)}</small><span class="xpbar"><i style="--p:${Math.round(save.xp / need * 100)}%"></i></span><small>つぎのレベルまで あと ${fmt(need - save.xp)} XP</small></div></div>
         <ul class="tips" style="margin-top:12px">
           <li><b>XP</b> はプレイするとたまる（1ループ = 10 XP、スコア100点 = 1 XP、ミッション受け取り = 10 XP）。</li>
-          <li>レベルが上がるたびに <b>カケラ</b>、決まったレベルで <b>限定スキン</b> がもらえる。</li>
+          <li>レベルが上がるたびに <b>カケラ</b>、決まったレベルで <b>新しいスキル</b> や <b>限定スキン</b> がもらえる。</li>
         </ul>
         <p class="glabel">レベル報酬</p>
         <div class="lv-rows">${rows.join('')}</div>`;
@@ -2407,7 +2614,10 @@ body.touch .keyhint { display: none; }
     },
   };
   function nextLevelSkinText() {
+    // the nearest goal: a new skill or a level skin, whichever comes first
+    const k = SKILLS.find(x => x.lv > save.level);
     const L = Object.keys(LEVEL_SKINS).map(Number).find(n => n > save.level);
+    if (k && (!L || k.lv <= L)) return `Lv.${k.lv}でスキル「${k.name}」`;
     return L ? `Lv.${L}で「${skinOf(LEVEL_SKINS[L]).name}」` : '';
   }
   function finishHowto() {
@@ -2459,6 +2669,8 @@ body.touch .keyhint { display: none; }
         { const c = pageEl.querySelector('.skin-show .char'); if (c) c.classList.add('pop'); }
         break;
       }
+      case 'skill-eq': toggleSkill(b.dataset.id); break;
+      case 'goto-skill': if (view === 'home') { closeModal(); setTab('skill'); } break;
       case 'skinfilter': skinFilter = b.dataset.val; setTab('skins', 'keep'); pageEl.querySelector('.skin-scroll').scrollTop = 0; break;
       case 'goto-ach': misView = 'ach'; achFilter = 'all'; setTab('missions'); break;
       case 'ach-detail': openModal('ach', { id: b.dataset.id }); break;
@@ -2740,7 +2952,8 @@ body.touch .keyhint { display: none; }
 
   // ================= input =================
   const keys = new Set();
-  let dashQueued = false, dashBuf = 0, joy = null, mouse = null;
+  let dashQueued = false, skillQueued = false, dashBuf = 0, joy = null, mouse = null;
+  const SKILL_KEYS = ['e', 'l', 'c'];
   const pad = { x: 0, y: 0, dash: false, start: false, back: false, select: false, nav: 0, navHold: 0 };
   const DASH_KEYS = [' ', 'shift', 'j', 'k', 'x'];
   const active = () => state === 'play' || state === 'rewind';
@@ -2816,6 +3029,7 @@ body.touch .keyhint { display: none; }
     if (active()) {
       if (e.repeat) return;
       if (DASH_KEYS.includes(k)) dashQueued = true;
+      if (SKILL_KEYS.includes(k)) skillQueued = true;
       if (k === 'p' || k === 'escape') togglePause();
       return;
     }
@@ -2885,10 +3099,11 @@ body.touch .keyhint { display: none; }
     if (Math.hypot(x, y) < 0.2) x = y = 0;
     if (b(14)) x = -1; if (b(15)) x = 1; if (b(12)) y = -1; if (b(13)) y = 1;
     pad.x = x; pad.y = y; pad.select = b(8);
-    const a = b(0), back = b(1), dash = b(0) || b(1) || b(2) || b(5) || b(7), start = b(9);
+    const a = b(0), back = b(1), dash = b(0) || b(1) || b(2) || b(5) || b(7), start = b(9), skill = b(3) || b(4) || b(6);
     if (view === 'boot') { if ((a && !pad.dash) || (start && !pad.start)) leaveBoot(); }
     else if (active()) {
       if (dash && !pad.dash) dashQueued = true;
+      if (skill && !pad.skill) skillQueued = true;
       if (start && !pad.start) togglePause();
     } else if (state === 'resuming') {
       if (start && !pad.start) togglePause();
@@ -2904,7 +3119,7 @@ body.touch .keyhint { display: none; }
       if (back && !pad.back) goBack();
       if (start && !pad.start && (state === 'paused' || state === 'resuming')) togglePause();
     }
-    pad.dash = dash; pad.back = back; pad.start = start;
+    pad.dash = dash; pad.back = back; pad.start = start; pad.skill = skill;
   }
 
   function inputVec() {
@@ -2934,6 +3149,14 @@ body.touch .keyhint { display: none; }
   dashBtn.addEventListener('pointerup', unhit);
   dashBtn.addEventListener('pointercancel', unhit);
   dashBtn.addEventListener('click', e => { if (e.detail === 0 && active()) dashQueued = true; });
+  skillBtn.addEventListener('pointerdown', e => {
+    e.preventDefault(); e.stopPropagation();
+    if (active()) { skillQueued = true; skillBtn.classList.add('hit'); }
+  });
+  const unhitSkill = () => skillBtn.classList.remove('hit');
+  skillBtn.addEventListener('pointerup', unhitSkill);
+  skillBtn.addEventListener('pointercancel', unhitSkill);
+  skillBtn.addEventListener('click', e => { if (e.detail === 0 && active()) skillQueued = true; });
   pauseBtn.innerHTML = I.pause;
   pauseBtn.addEventListener('click', () => togglePause());
 
@@ -2974,9 +3197,28 @@ body.touch .keyhint { display: none; }
     hud.score.textContent = fmt(shownScore);
     hud.best.textContent = 'BEST ' + fmt(best);
   }
+  // the SKILL button shows the equipped active skill; its ring fills one step per coin
+  function skillBtnSetup() {
+    const k = !tut && run && run.act;
+    skillBtn.hidden = !k;
+    if (k) { $('skillIc').innerHTML = k.ic; skillBtn.setAttribute('aria-label', 'スキル：' + k.name); }
+    skCache = '';
+  }
+  let skCache = '';
+  function syncSkillBtn() {
+    if (skillBtn.hidden || !run || !run.act) return;
+    const key = run.charge + '/' + run.act.charge;
+    if (key === skCache) return;
+    skCache = key;
+    const full = run.charge >= run.act.charge;
+    skillBtn.style.setProperty('--ready', run.charge / run.act.charge);
+    skillBtn.classList.toggle('full', full);
+    $('skillN').textContent = full ? 'READY' : key;
+  }
   let cdCache = -1;
   function syncDashBtn() {
-    const v = Math.round((1 - P.cd / DASH_CD) * 40) / 40;
+    syncSkillBtn();
+    const v = Math.round((1 - P.cd / dashCd()) * 40) / 40;
     if (v !== cdCache) {
       cdCache = v;
       dashBtn.style.setProperty('--ready', v);
@@ -3243,7 +3485,7 @@ body.touch .keyhint { display: none; }
     const urgent = live && !tut && timeLeft <= 180;
     if (coin && (live || state === 'dying')) {
       const t = tick / 60, pulse = 1 + Math.sin(t * 6) * 0.08;
-      const frac = tut ? 1 : clamp(timeLeft / LIMIT, 0, 1);
+      const frac = tut ? 1 : clamp(timeLeft / limit(), 0, 1);
       if (tut) {   // a soft beacon so the target is obvious
         const k = (tick % 60) / 60;
         ctx.strokeStyle = `rgba(255,182,39,${0.6 * (1 - k)})`; ctx.lineWidth = 4;
@@ -3305,8 +3547,8 @@ body.touch .keyhint { display: none; }
         ctx.globalAlpha = 1;
       }
       if (graceLeft > 0 && live) {
-        ctx.strokeStyle = skin.color; ctx.lineWidth = 2; ctx.globalAlpha = graceLeft / GRACE;
-        ctx.beginPath(); ctx.arc(P.x, P.y, R + 10 + (GRACE - graceLeft) * 0.6, 0, Math.PI * 2); ctx.stroke();
+        ctx.strokeStyle = skin.color; ctx.lineWidth = 2; ctx.globalAlpha = Math.min(1, graceLeft / GRACE);
+        ctx.beginPath(); ctx.arc(P.x, P.y, R + 10 + Math.max(0, GRACE - graceLeft) * 0.6, 0, Math.PI * 2); ctx.stroke();
         ctx.globalAlpha = 1;
       }
       if (live) {
@@ -3314,7 +3556,7 @@ body.touch .keyhint { display: none; }
           ctx.strokeStyle = 'rgba(234,241,248,0.18)'; ctx.lineWidth = 3;
           ctx.beginPath(); ctx.arc(P.x, P.y, R + 8, 0, Math.PI * 2); ctx.stroke();
           ctx.strokeStyle = 'rgba(234,241,248,0.7)';
-          ctx.beginPath(); ctx.arc(P.x, P.y, R + 8, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - P.cd / DASH_CD)); ctx.stroke();
+          ctx.beginPath(); ctx.arc(P.x, P.y, R + 8, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - P.cd / dashCd())); ctx.stroke();
         } else if (P.dash <= 0) {
           const ax = P.x + P.dx * (R + 12), ay = P.y + P.dy * (R + 12), nx = -P.dy, ny = P.dx;
           ctx.fillStyle = skin.color; ctx.globalAlpha = 0.85;
@@ -3330,6 +3572,12 @@ body.touch .keyhint { display: none; }
         }
       }
       drawSkin(ctx, at.x, at.y, R, skin, { dx: P.vx, dy: P.vy, t: tick / 60 });
+      if (P.inv > 0 && live) {   // shield bubble; it flickers in its last half second
+        if (P.inv > 30 || tick % 6 < 3) {
+          ctx.strokeStyle = C.ice; ctx.lineWidth = 3; ctx.fillStyle = 'rgba(143,227,255,0.14)';
+          ctx.beginPath(); ctx.arc(at.x, at.y, R + 9 + Math.sin(tick / 5) * 1.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        }
+      }
       if (P.dash > 0) {
         ctx.strokeStyle = C.chalk; ctx.lineWidth = 3;
         ctx.beginPath(); ctx.arc(at.x, at.y, R + 3, 0, Math.PI * 2); ctx.stroke();
@@ -3349,14 +3597,18 @@ body.touch .keyhint { display: none; }
 
     // in-arena HUD: time bar across the top edge, with the chain window marked
     if (!tut && (live || rewinding || state === 'dying')) {
-      const frac = rewinding ? 1 : clamp(timeLeft / LIMIT, 0, 1), bh = 10;
+      const frac = rewinding ? 1 : clamp(timeLeft / limit(), 0, 1), bh = 10;
       ctx.fillStyle = 'rgba(234,241,248,0.12)'; ctx.fillRect(0, 0, W, bh);
       ctx.fillStyle = urgent ? C.coral : C.amber; ctx.fillRect(0, 0, W * frac, bh);
-      const cx = W * (1 - FAST_CLEAR / LIMIT);
-      ctx.fillStyle = frame <= FAST_CLEAR && live ? C.chalk : 'rgba(234,241,248,0.35)';
+      const cx = W * (1 - fastClear() / limit());
+      ctx.fillStyle = frame <= fastClear() && live ? C.chalk : 'rgba(234,241,248,0.35)';
       ctx.fillRect(cx - 2, 0, 4, bh + 8);
       const y = bh + 14;
       if (chain > 0) pill(16, y, 'CHAIN ' + chain + ' ×' + (1 + Math.min(chain, 8) * 0.25).toFixed(2), C.amber, C.deep);
+      if (run && run.act && !isTouch() && (live || rewinding)) {
+        const full = run.charge >= run.act.charge;
+        pill(16, W - fs(20) * 1.6 - 16, run.act.name + (full ? ' READY · E' : ` ${run.charge}/${run.act.charge}`), full ? C.ice : 'rgba(5,16,34,0.6)', full ? C.deep : C.ice);
+      }
       if (freezeLeft > 0 && live) pill(W - 16, y, 'FREEZE ' + (freezeLeft / 60).toFixed(1) + 's', C.ice, C.deep, 'right');
       else if (live) {
         ctx.fillStyle = urgent ? C.coral : 'rgba(234,241,248,0.6)'; ctx.font = `600 ${fs(20)}px ${MONO}`;
