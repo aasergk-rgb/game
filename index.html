@@ -170,7 +170,9 @@ svg { display: block; }
 .lv { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--chalk-dim); }
 .lv em { font-style: normal; font-weight: 800; color: var(--amber); }
 .lv .xpbar { width: 84px; height: 6px; }
-.pages { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.pages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.page.page-in { animation: page-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } }
 .page { padding: 8px 16px 24px; }
 .page-home { min-height: 100%; display: flex; flex-direction: column; gap: 16px; }
 .page-home .hero { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; padding-top: 8px; min-height: 230px; }
@@ -262,6 +264,8 @@ svg { display: block; }
 .tab .ic { width: 52px; height: 30px; border-radius: 999px; display: grid; place-items: center; transition: background-color 0.2s; }
 .tab svg { width: 24px; height: 24px; }
 .tab[aria-current="page"] { color: var(--amber); }
+.tab:active .ic { transform: scale(0.88); }
+.tab .ic { transition: background-color 0.2s, transform 0.1s; }
 .tab[aria-current="page"] .ic { background: rgba(255, 182, 39, 0.16); }
 .tab .dot { position: absolute; }
 
@@ -289,6 +293,7 @@ body.mousectl .board canvas { cursor: crosshair; }
   transition: opacity 0.2s;
 }
 .stick-hint.off { opacity: 0; }
+.stick-hint.gone { display: none; }
 .dash {
   --ready: 1;
   position: absolute; z-index: 3; right: 22px; bottom: calc(26px + var(--safe-b));
@@ -310,7 +315,9 @@ body.lefty .dash { right: auto; left: 22px; }
 body:not(.touch) .stick-hint, body:not(.touch) .dash { display: none; }
 .keyhint { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font-size: 0.7rem; color: var(--chalk-dim); pointer-events: none; }
 body.touch .keyhint { display: none; }
-.peek-back { position: absolute; z-index: 9; left: 50%; bottom: calc(24px + var(--safe-b)); transform: translateX(-50%); }
+.peek-back { position: absolute; z-index: 9; left: 50%; bottom: calc(24px + var(--safe-b)); transform: translateX(-50%); animation: fade 0.25s; }
+.skin-show .char.pop { animation: skin-pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1), bob 2s ease-in-out 0.45s infinite; }
+@keyframes skin-pop { from { transform: scale(0.6); } }
 
 /* ---------- tutorial ---------- */
 .tut { position: absolute; z-index: 2; left: 10px; right: 10px; top: 16px; display: flex; justify-content: center; pointer-events: none; }
@@ -378,6 +385,23 @@ body.touch .keyhint { display: none; }
   .sheet::before { display: none; }
 }
 @keyframes pop { from { opacity: 0; transform: translate(-50%, -46%) scale(0.94); } }
+/* closing: the sheet slides back down (or the card shrinks away) and the scrim fades */
+.modal.closing { pointer-events: none; }
+.modal.closing .scrim { animation: fade-out 0.26s ease forwards; }
+.modal.closing .sheet { animation: sheet-down 0.26s cubic-bezier(0.4, 0, 1, 1) forwards; }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes sheet-down { to { transform: translateY(105%); } }
+@media (min-width: 700px) and (min-height: 560px) {
+  .modal.closing .sheet { animation: pop-out 0.2s ease-in forwards; }
+}
+@keyframes pop-out { to { opacity: 0; transform: translate(-50%, -47%) scale(0.95); } }
+/* switching from one sheet to another keeps the sheet and fades in the new content */
+.sheet.swap > * { animation: swap-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes swap-in { from { opacity: 0; transform: translateY(10px); } }
+/* drag handle: a taller invisible grab zone around the grey bar */
+.sheet.dragging { transition: none !important; }
+.sheet.settle { transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.25, 1); }
+.sheet::before { touch-action: none; }
 .sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .sheet-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.45rem; }
 .sheet-head .roundbtn { width: 40px; height: 40px; }
@@ -469,7 +493,7 @@ body.touch .keyhint { display: none; }
   .ghud { padding-top: calc(6px + var(--safe-t)); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .view.enter, .toast, .sheet, .scrim, .stamp, .newbest, .lvup { animation: none; }
+  .view.enter, .toast, .sheet, .scrim, .stamp, .newbest, .lvup, .page.page-in, .sheet.swap > *, .modal.closing .sheet, .modal.closing .scrim { animation: none; }
   .hero-stage .char, .hero-stage .echo, .skin-show .char, .tap { animation: none; }
   .hero-stage .echo { display: none; }
 }
@@ -904,6 +928,7 @@ body.touch .keyhint { display: none; }
     particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false;
     run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, startLv: save.level, startXp: save.xp };
     closeModal(); peekBack.hidden = true;
+    stickHint.classList.toggle('gone', save.stats.plays >= 3);
     save.stats.plays++;
     if (m === 'daily') save.stats.dailyPlays++;
     persist();
@@ -1056,6 +1081,7 @@ body.touch .keyhint { display: none; }
     particles = []; popups = []; unlockedThisRun = []; retryHold = 0; dashBuf = 0; dashQueued = false;
     run = { nears: 0, phases: 0, erases: 0, freezes: 0, maxChain: 0, dashes: 0, frames: 0, startLv: save.level, startXp: save.xp };
     closeModal(); peekBack.hidden = true;
+    stickHint.classList.remove('gone');
     showView('game');
     tutUI(true);
     tutSetup(1);
@@ -1238,6 +1264,12 @@ body.touch .keyhint { display: none; }
     tick++;
     pollPad();
     if (state === 'paused') return;
+    if (state === 'resuming') {
+      resumeT--;
+      if (resumeT > 0 && resumeT % 30 === 0) sfx.tick();
+      if (resumeT <= 0) { state = pausedFrom; bgmStart(); sfx.start(); }
+      return;
+    }
     if (hitstop > 0) { hitstop--; return; }
     shake *= 0.86; if (flash > 0) flash -= 0.035;
     if (readyPulse > 0) readyPulse--;
@@ -1351,9 +1383,10 @@ body.touch .keyhint { display: none; }
   function setTab(t, silent) {
     tab = t;
     for (const b of tabsEl.children) b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false');
+    const keep = silent === 'keep' ? pagesEl.scrollTop : 0;
     pageEl.innerHTML = PAGES[t]();
-    pageEl.className = 'page' + (t === 'home' ? ' page-home' : '');
-    pagesEl.scrollTop = 0;
+    pageEl.className = 'page' + (t === 'home' ? ' page-home' : '') + (silent ? '' : ' page-in');
+    pagesEl.scrollTop = keep;
     if (!silent) sfx.tab();
     const f = pageEl.querySelector('[data-focus]');
     if (f && !isTouch()) f.focus({ preventScroll: true });
@@ -1435,10 +1468,21 @@ body.touch .keyhint { display: none; }
   // ================= modal sheets =================
   let modalKind = null, modalOpts = {}, shareText = '';
   const closableByScrim = { settings: 1, howto: 1, pause: 1 };
+  let closeTimer = 0;
+  const modalOpen = () => !modal.hidden && !modal.classList.contains('closing');
+  const cardMode = () => matchMedia('(min-width: 700px) and (min-height: 560px)').matches;
+  function resetSheetPos() {
+    sheet.classList.remove('dragging', 'settle');
+    sheet.style.transform = ''; scrim.style.opacity = '';
+  }
   function openModal(kind, opts) {
+    const swapping = modalOpen();
+    clearTimeout(closeTimer);
+    modal.classList.remove('closing');
+    resetSheetPos();
     modalKind = kind; modalOpts = opts || {};
     sheet.innerHTML = MODALS[kind](modalOpts);
-    sheet.className = 'sheet sheet-' + kind;
+    sheet.className = 'sheet sheet-' + kind + (swapping ? ' swap' : '');
     modal.hidden = false;
     sheet.scrollTop = 0;
     if (kind !== 'result') sfx.open();
@@ -1446,7 +1490,47 @@ body.touch .keyhint { display: none; }
     const f = sheet.querySelector('[data-focus]');
     if (f) f.focus({ preventScroll: true });
   }
-  function closeModal() { modal.hidden = true; modalKind = null; }
+  // hide with the reverse of the opening motion; the sheet stays in the DOM until it has left
+  function hideSheet() {
+    if (modal.hidden || modal.classList.contains('closing')) return;
+    sheet.classList.remove('dragging', 'settle');
+    modal.classList.add('closing');
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(() => { modal.classList.remove('closing'); modal.hidden = true; resetSheetPos(); }, reduceMotion ? 0 : 270);
+  }
+  function closeModal() { modalKind = null; hideSheet(); }
+
+  // swipe the sheet down by its top edge (the grey bar and title row) to dismiss it
+  const dismissible = () => !!closableByScrim[modalKind];
+  let drag = null;
+  sheet.addEventListener('pointerdown', e => {
+    if (!modalOpen() || cardMode()) return;
+    if (e.clientY - sheet.getBoundingClientRect().top > 76) return;
+    if (e.target.closest('button, input, .carousel')) return;
+    drag = { id: e.pointerId, y0: e.clientY, t0: performance.now(), dy: 0, h: sheet.offsetHeight };
+    try { sheet.setPointerCapture(e.pointerId); } catch (err) {}
+    sheet.classList.add('dragging');
+  });
+  sheet.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    let dy = e.clientY - drag.y0;
+    dy = dy < 0 ? dy * 0.15 : dismissible() ? dy : dy * 0.3;   // rubber-band when it cannot close
+    drag.dy = dy;
+    sheet.style.transform = `translateY(${dy}px)`;
+    if (dismissible()) scrim.style.opacity = String(Math.max(0, 1 - dy / drag.h));
+  });
+  const endDrag = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null;
+    sheet.classList.remove('dragging');
+    const v = d.dy / Math.max(1, performance.now() - d.t0);
+    if (dismissible() && (d.dy > d.h * 0.28 || (v > 0.55 && d.dy > 40))) { buzz(6); goBack(); return; }
+    sheet.classList.add('settle');
+    sheet.style.transform = ''; scrim.style.opacity = '';
+    setTimeout(() => sheet.classList.remove('settle'), 300);
+  };
+  sheet.addEventListener('pointerup', endDrag);
+  sheet.addEventListener('pointercancel', endDrag);
   scrim.addEventListener('click', () => { if (closableByScrim[modalKind]) goBack(); });
 
   const sheetHead = (title, act) => `<div class="sheet-head"><h2>${title}</h2><button class="roundbtn" type="button" data-act="${act || 'close'}" aria-label="とじる">${I.close}</button></div>`;
@@ -1627,7 +1711,8 @@ body.touch .keyhint { display: none; }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const act = b.dataset.act;
-    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip'].indexOf(act) < 0) sfx.ui();
+    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin'].indexOf(act) < 0) sfx.ui();
+    if (isTouch()) buzz(5);
     switch (act) {
       case 'tab': if (b.dataset.tab !== tab || view !== 'home') setTab(b.dataset.tab); break;
       case 'endless': startRun('endless'); break;
@@ -1641,14 +1726,21 @@ body.touch .keyhint { display: none; }
       case 'howto': openModal('howto', {}); break;
       case 'settings': openModal('settings', { from: modalKind === 'pause' ? 'pause' : null }); break;
       case 'close': goBack(); break;
-      case 'skin': save.skin = b.dataset.skin; persist(); renderProfile(); setTab('skins', true); { const n = pageEl.querySelector(`[data-skin="${save.skin}"]`); if (n) n.focus({ preventScroll: true }); } break;
+      case 'skin': {
+        if (save.skin === b.dataset.skin) break;
+        save.skin = b.dataset.skin; persist(); renderProfile(); setTab('skins', 'keep');
+        const n = pageEl.querySelector(`[data-skin="${save.skin}"]`); if (n) n.focus({ preventScroll: true });
+        const c = pageEl.querySelector('.skin-show .char'); if (c) c.classList.add('pop');
+        sfx.ach(); buzz(10);
+        break;
+      }
       case 'ctl': save.settings.control = b.dataset.val; persist(); applyBodyFlags(); for (const x of sheet.querySelectorAll('[data-act="ctl"]')) x.setAttribute('aria-pressed', x.dataset.val === save.settings.control); break;
       case 'fullscreen':
         if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
         else document.documentElement.requestFullscreen().catch(() => toast(I.full, '全画面', 'この環境では全画面にできません'));
         setTimeout(() => { if (modalKind === 'settings') b.textContent = document.fullscreenElement ? '元にもどす' : '全画面にする'; }, 300);
         break;
-      case 'peek': modal.hidden = true; peekBack.hidden = false; revealT = 0; peekBack.focus(); break;
+      case 'peek': hideSheet(); peekBack.hidden = false; revealT = 0; peekBack.focus(); break;
       case 'share': doShare(b); break;
       case 'reset':
         if (Date.now() - resetArmed < 4000) {
@@ -1663,7 +1755,13 @@ body.touch .keyhint { display: none; }
     }
   });
   peekBack.addEventListener('click', unpeek);
-  function unpeek() { if (state === 'result' && peekBack.hidden === false) { peekBack.hidden = true; modal.hidden = false; const f = sheet.querySelector('[data-act="peek"]'); if (f) f.focus(); } }
+  function unpeek() {
+    if (state !== 'result' || peekBack.hidden) return;
+    peekBack.hidden = true;
+    clearTimeout(closeTimer); modal.classList.remove('closing'); resetSheetPos();
+    modal.hidden = false;
+    const f = sheet.querySelector('[data-act="peek"]'); if (f) f.focus();
+  }
   function doShare(b) {
     const label = b.querySelector('span'), box = $('shareBox');
     const fallback = () => { box.hidden = false; box.value = shareText; box.focus(); box.select(); label.textContent = '下からコピー'; };
@@ -1693,7 +1791,7 @@ body.touch .keyhint { display: none; }
   const active = () => state === 'play' || state === 'rewind';
   const stickFull = () => 64 - save.settings.stick * 30;   // px of travel for full speed
 
-  function container() { return !modal.hidden ? sheet : view === 'home' ? vHome : view === 'game' ? vGame : vBoot; }
+  function container() { return modalOpen() ? sheet : view === 'home' ? vHome : view === 'game' ? vGame : vBoot; }
   function focusables() {
     return [...container().querySelectorAll('button:not([disabled]), input, textarea')].filter(n => n.offsetParent !== null && !n.closest('[hidden]'));
   }
@@ -1708,6 +1806,7 @@ body.touch .keyhint { display: none; }
   }
   function goBack() {
     if (view === 'boot') { leaveBoot(); return; }
+    if (state === 'resuming') { togglePause(); return; }
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
     if (modalKind === 'settings') { if (modalOpts.from === 'pause') openModal('pause'); else closeModal(); return; }
     if (modalKind === 'howto') { closeModal(); return; }
@@ -1732,21 +1831,21 @@ body.touch .keyhint { display: none; }
       if (k === 'p' || k === 'escape') togglePause();
       return;
     }
-    if (arrow && (!modal.hidden || view === 'home')) { e.preventDefault(); moveFocus(k === 'arrowup' || k === 'arrowleft' ? -1 : 1); return; }
+    if (arrow && (modalOpen() || view === 'home')) { e.preventDefault(); moveFocus(k === 'arrowup' || k === 'arrowleft' ? -1 : 1); return; }
     if (e.repeat) return;
     if (k === 'escape' || k === 'backspace') { goBack(); return; }
-    if (state === 'paused' && k === 'p') { togglePause(); return; }
+    if ((state === 'paused' || state === 'resuming') && k === 'p') { togglePause(); return; }
     if (state === 'result' && !onButton && (k === ' ' || k === 'enter' || k === 'r')) startRun(mode);
   });
   addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
-  addEventListener('blur', () => { keys.clear(); endStick(); if (active()) togglePause(); });
-  document.addEventListener('visibilitychange', () => { if (document.hidden && active()) togglePause(); });
+  addEventListener('blur', () => { keys.clear(); endStick(); if (active() || state === 'resuming') togglePause(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && (active() || state === 'resuming')) togglePause(); });
 
   // anywhere on the game screen: a floating stick appears under the thumb
   vGame.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
-    if (!active()) return;
+    if (!active() && state !== 'resuming') return;
     if (e.pointerType === 'mouse' && save.settings.control === 'mouse') { dashQueued = true; return; }
     if (joy) { dashQueued = true; return; }          // a second finger dashes
     e.preventDefault();
@@ -1803,6 +1902,8 @@ body.touch .keyhint { display: none; }
     else if (active()) {
       if (dash && !pad.dash) dashQueued = true;
       if (start && !pad.start) togglePause();
+    } else if (state === 'resuming') {
+      if (start && !pad.start) togglePause();
     } else {
       const nd = y < -0.5 || x < -0.5 ? -1 : y > 0.5 || x > 0.5 ? 1 : 0;
       if (nd && nd !== pad.nav) { moveFocus(nd); pad.navHold = 0; }
@@ -1813,7 +1914,7 @@ body.touch .keyhint { display: none; }
         else { const f = document.activeElement; if (f && container().contains(f) && f.tagName === 'BUTTON') f.click(); else moveFocus(1); }
       }
       if (back && !pad.back) goBack();
-      if (start && !pad.start && state === 'paused') togglePause();
+      if (start && !pad.start && (state === 'paused' || state === 'resuming')) togglePause();
     }
     pad.dash = dash; pad.back = back; pad.start = start;
   }
@@ -1848,14 +1949,20 @@ body.touch .keyhint { display: none; }
   pauseBtn.innerHTML = I.pause;
   pauseBtn.addEventListener('click', () => togglePause());
 
+  // resuming counts down 3-2-1 so the player is not dropped straight back into danger
+  const RESUME = 90;
+  let resumeT = 0;
   function togglePause() {
     if (active()) {
       pausedFrom = state; state = 'paused'; endStick();
       bgmStop();
       openModal('pause');
+    } else if (state === 'resuming') {
+      state = 'paused';
+      openModal('pause');
     } else if (state === 'paused') {
-      state = pausedFrom; closeModal(); keys.clear();
-      initAudio(); bgmStart();
+      state = 'resuming'; resumeT = RESUME; closeModal(); keys.clear();
+      initAudio(); sfx.tick();
     }
   }
 
@@ -1996,8 +2103,9 @@ body.touch .keyhint { display: none; }
     drawArena();
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-    const live = state === 'play' || (state === 'paused' && pausedFrom === 'play');
-    const rewinding = state === 'rewind' || (state === 'paused' && pausedFrom === 'rewind');
+    const held = state === 'paused' || state === 'resuming';
+    const live = state === 'play' || (held && pausedFrom === 'play');
+    const rewinding = state === 'rewind' || (held && pausedFrom === 'rewind');
     let gi = Math.floor(gtime);
     if (rewinding) {
       const p = Math.min(1, rewindT / REWIND), e = p * p * (3 - 2 * p);
@@ -2196,6 +2304,16 @@ body.touch .keyhint { display: none; }
       ctx.fillStyle = C.amber; ctx.fillRect(x, y + 6, w * retryHold / RETRY_HOLD, 10);
     }
     if (flash > 0) { ctx.fillStyle = `rgba(255,248,230,${flash * 0.35})`; ctx.fillRect(-60, -60, W + 120, W + 120); }
+    if (state === 'resuming') {
+      const n = Math.ceil(resumeT / 30), k = (resumeT % 30) / 30;
+      ctx.fillStyle = 'rgba(8,26,51,0.35)'; ctx.fillRect(0, 0, W, W);
+      ctx.save(); ctx.translate(W / 2, W / 2); ctx.scale(1 + k * 0.35, 1 + k * 0.35);
+      ctx.globalAlpha = 0.4 + (1 - k) * 0.6;
+      ctx.font = `400 220px ${DISPLAY}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.lineWidth = 18; ctx.strokeStyle = C.deep; ctx.strokeText(String(n), 0, 10);
+      ctx.fillStyle = C.amber; ctx.fillText(String(n), 0, 10);
+      ctx.restore();
+    }
   }
 
   function drawFx() {
