@@ -439,6 +439,46 @@ body.touch .keyhint { display: none; }
 .rg .rw .gem { width: 13px; height: 13px; }
 .rg small { font-size: 0.6rem; font-weight: 800; color: var(--chalk-dim); }
 
+/* achievement detail */
+.ach.tappable { cursor: pointer; transition: transform 0.08s; }
+.ach.tappable:active { transform: scale(0.985); }
+.ad-hero { display: flex; align-items: center; gap: 16px; margin: 2px 0 14px; }
+.ad-medal { flex: none; width: 76px; height: 76px; border-radius: 24px; display: grid; place-items: center; color: var(--tc); background: rgba(5, 16, 34, 0.35); box-shadow: inset 0 0 0 3px var(--tc); }
+.ad-medal svg { width: 40px; height: 40px; }
+.ad-medal.done { background: var(--tc); color: var(--bg-1); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.ad-title { min-width: 0; display: grid; gap: 2px; }
+.ad-title .tier { font-size: 0.9rem; }
+.ad-title em { font-style: normal; font-size: 0.7rem; font-weight: 800; color: var(--tc); }
+.ad-title b { font-family: var(--font-display); font-weight: 400; font-size: 1.45rem; line-height: 1.2; }
+.ad-title p { margin: 0; font-size: 0.84rem; color: var(--chalk-dim); }
+.ad-prog { display: grid; gap: 8px; padding: 14px 16px; }
+.ad-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.ad-row small { font-size: 0.72rem; font-weight: 800; color: var(--chalk-dim); }
+.ad-row b { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; }
+.ad-prog .xpbar { height: 10px; }
+.ad-status { font-size: 0.74rem; font-weight: 800; color: var(--chalk-dim); }
+.ad-status.ok { color: var(--mint); }
+.ad-rewards { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.ad-rewards:has(.skinbox) { grid-template-columns: 1fr 1.3fr; }
+.rwbox { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 16px 10px; text-align: center; }
+.rwbox b { font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; }
+.rwbox small { font-size: 0.68rem; font-weight: 800; color: var(--chalk-dim); }
+.gem.big { width: 26px; height: 26px; border-radius: 6px; margin: 6px 0; }
+.skinbox { cursor: pointer; }
+.skinbox .char { width: 56px; height: 56px; margin-bottom: 4px; }
+.skinbox:active { transform: scale(0.98); }
+.ad-series { display: grid; gap: 6px; }
+.ad-item { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-radius: 14px; cursor: pointer; text-align: left; background: rgba(234, 241, 248, 0.06); }
+.ad-item .mini { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; color: var(--tc); box-shadow: inset 0 0 0 2px var(--tc); }
+.ad-item .mini svg { width: 16px; height: 16px; }
+.ad-item.done .mini { background: var(--tc); color: var(--bg-1); box-shadow: none; }
+.ad-item .nm { font-size: 0.82rem; font-weight: 800; }
+.ad-item .nm small { display: block; font-size: 0.66rem; font-weight: 500; color: var(--chalk-dim); }
+.ad-item .tier { color: var(--tc); }
+.ad-item.cur { box-shadow: inset 0 0 0 2px var(--chalk); }
+.ad-item .badge { position: absolute; top: -6px; right: -4px; }
+.linkish { border: 0; background: none; padding: 0; cursor: pointer; }
+
 /* ---------- tutorial ---------- */
 .tut { position: absolute; z-index: 2; left: 10px; right: 10px; top: 16px; display: flex; justify-content: center; pointer-events: none; }
 .tut-card {
@@ -827,6 +867,37 @@ body.touch .keyhint { display: none; }
     ['skins5',   'コレクター',     'スキンを5種類集める',                     2,  80, null,      () => [ownedCount(), 5]],
     ['skins15',  '大コレクター',   'スキンを15種類集める',                    4, 300, null,      () => [ownedCount(), 15]],
   ].map(([id, name, desc, tier, , skin, prog]) => ({ id, name, desc, tier, shards: TIER_SHARDS[tier], skin, prog }));
+  // detail sheet: which series an achievement belongs to, what kind of record it tracks, and a hint
+  const SERIES = {
+    loop:    ['ループ数', 'best', '最短ルートでコインを取ると残像の通り道が短くなり、長く生き残れる。消しゴムで長い残像を消すのも効果的。'],
+    score:   ['スコア', 'best', 'CHAIN を続けるとコインの得点が最大×3。ニアミスやすり抜けでもボーナスが入る。'],
+    near:    ['ニアミス', 'best', '残像に触れずに、すぐ横をかすめるとニアミス。予知ドットで残像の少し先の動きを読もう。'],
+    phase:   ['すり抜け', 'best', 'ダッシュ中に残像と重なるとすり抜け。DASH は約1.4秒で回復するので、残像が近づいたら使おう。'],
+    chain:   ['CHAIN', 'best', 'ループ開始から3秒以内にコインを取り続けると CHAIN が伸びる。上のタイムバーの白い目盛りが3秒の目安。'],
+    erase:   ['消しゴム', 'best', '消しゴムは4ループごとに出現する（残像が3体以上いるとき）。取るといちばん長い残像が消える。'],
+    storm:   ['ECHO STORM', 'best', 'ECHO STORM は10ループ目から5ループごと。残像が1.5倍速になるので、予知ドットをよく見よう。'],
+    daily:   ['デイリー', 'total', 'デイリーチャレンジは毎日更新。全員が同じ配置で遊べる。'],
+    streak:  ['連続ログイン', 'best', '毎日ゲームを開くとログインボーナス。1日空くと連続日数は1に戻る。'],
+    plays:   ['プレイ', 'total', '遊ぶたびに増えていく。'],
+    mission: ['ミッション', 'total', 'デイリーミッションは毎日3つ。ミッションタブで受け取るとカウントされる。'],
+    level:   ['レベル', 'now', 'プレイやミッションの受け取りで XP がたまる。'],
+    skins:   ['スキン', 'now', 'ショップで買う、実績・レベル報酬・ログインボーナスでもらう、の4通りで集められる。'],
+    misc:    ['テクニック', 'flag', ''],
+  };
+  const MISC_HINTS = {
+    first: 'ダイヤ形のコインに触れると取れる。',
+    tutorial: '設定の「チュートリアル」からいつでも遊べる。',
+    freeze: '砂時計は6ループ目から6ループごとに出現する（残像が3体以上いるとき）。',
+    nodash: 'ダッシュボタンを一度も押さずに10ループ。予知ドットを頼りに、よけるルートを考えよう。',
+    crowd: '消しゴムを使わずにループを重ねると、残像はどんどん増えていく。',
+    fast: 'ループ開始時にコインが近い向きへすぐ走り出そう。ダッシュで距離を詰めるのも手。',
+    clutch: 'タイムバーが赤くなってからが勝負。残り0.5秒以内にコインに触れよう。',
+  };
+  const achSeries = id => {
+    const m = id.match(/^(loop|score|near|phase|chain|erase|storm|daily|streak|plays|total|mission|level|skins)/);
+    return m ? (m[1] === 'total' ? 'plays' : m[1]) : 'misc';
+  };
+  const RECORD_LABEL = { best: '1回のプレイでの最高記録', total: '通算', now: '現在', flag: '達成したかどうか' };
   const LEVEL_SKINS = { 5: 'bubble', 10: 'ninja', 15: 'wizard', 20: 'royal', 30: 'aurora' };
   const levelReward = lv => ({ shards: 5 + lv * 3, skin: LEVEL_SKINS[lv] || null });
   const LOGIN = [10, 10, 15, 15, 20, 25, 40];
@@ -1797,7 +1868,7 @@ body.touch .keyhint { display: none; }
       else if (sel.src === 'shop') action = save.shards >= sel.price
         ? `<button class="btn3d wide" type="button" data-act="buy" data-skin="${sel.id}"><span class="gem"></span>${fmt(sel.price)} で購入</button>`
         : `<button class="btn3d dark wide" type="button" disabled><span class="gem"></span>${fmt(sel.price)}（あと ${fmt(sel.price - save.shards)}）</button>`;
-      else action = `<button class="btn3d dark wide" type="button" data-act="goto-ach">${I.lock}入手方法を見る</button>`;
+      else action = `<button class="btn3d dark wide" type="button" data-act="skin-how" data-skin="${sel.id}">${I.lock}入手方法を見る ›</button>`;
       const filters = [['all', 'すべて'], ['owned', '所持'], ['shop', 'ショップ'], ['limited', '限定']];
       const shown = SKINS.filter(k => skinFilter === 'all' || (skinFilter === 'owned' ? owns(k.id) : skinFilter === 'shop' ? k.src === 'shop' : (k.src !== 'shop' && k.src !== 'start')));
       const cells = shown.map(k => {
@@ -1848,7 +1919,7 @@ body.touch .keyhint { display: none; }
         const done = achDone(a), [v, t] = a.prog(), p = done ? 1 : Math.min(1, v / t), [tl, tc] = TIERS[a.tier];
         const reward = `${gemRw(a.shards)}${a.skin ? `<span class="rw-skin">${skinIcon(a.skin)}${skinOf(a.skin).name}</span>` : ''}`;
         const act = achClaimable(a) ? `<button class="btn3d small" type="button" data-act="claim-ach" data-id="${a.id}">受け取る</button>` : done ? `<span class="claimed-mark">${I.check}受取済</span>` : '';
-        return `<div class="card ach${done ? ' done' : ''}${done && !achClaimable(a) ? ' claimed' : ''}" style="--tc:${tc}">
+        return `<div class="card ach tappable${done ? ' done' : ''}${done && !achClaimable(a) ? ' claimed' : ''}" style="--tc:${tc}" data-act="ach-detail" data-id="${a.id}" role="button" tabindex="0">
           <span class="medal">${done ? I.trophy : I.lock}</span>
           <div class="ach-head"><b>${a.name}</b><span class="tier" title="${tl}">${'★'.repeat(a.tier)}<i>${'★'.repeat(5 - a.tier)}</i></span></div>
           <span class="ach-desc">${a.desc} · <em>${tl}</em></span>
@@ -1892,7 +1963,7 @@ body.touch .keyhint { display: none; }
 
   // ================= modal sheets =================
   let modalKind = null, modalOpts = {}, shareText = '';
-  const closableByScrim = { settings: 1, howto: 1, pause: 1, level: 1, login: 1 };
+  const closableByScrim = { settings: 1, howto: 1, pause: 1, level: 1, login: 1, ach: 1 };
   let closeTimer = 0;
   const modalOpen = () => !modal.hidden && !modal.classList.contains('closing');
   const cardMode = () => matchMedia('(min-width: 700px) and (min-height: 560px)').matches;
@@ -2085,13 +2156,54 @@ body.touch .keyhint { display: none; }
         <button class="btn3d dark wide" type="button" data-act="home">${I.home}ホームへ</button>
       </div>`;
     },
+    ach(o) {
+      const a = ACH.find(x => x.id === o.id);
+      if (!a) return '';
+      const done = achDone(a), claimable = achClaimable(a), [v, t] = a.prog(), [tl, tc] = TIERS[a.tier];
+      const ser = achSeries(a.id), [serName, kind0, hint0] = SERIES[ser];
+      const kind = ser === 'misc' && a.id === 'first' ? 'total' : ser === 'streak' ? 'best' : kind0;
+      const hint = MISC_HINTS[a.id] || hint0;
+      const p = done ? 1 : Math.min(1, v / t);
+      const when = ts => ts > 1e9 ? new Date(ts).toLocaleDateString('ja-JP') : '';
+      const status = save.achClaimed[a.id] ? `受け取り済み${when(save.achClaimed[a.id]) ? '（' + when(save.achClaimed[a.id]) + '）' : ''}`
+        : done ? `達成！${when(save.ach[a.id]) ? when(save.ach[a.id]) + ' · ' : ''}報酬を受け取れます` : `あと ${fmt(t - Math.min(v, t))}`;
+      const sk = a.skin ? skinOf(a.skin) : null;
+      const challenge = done ? '' : ser === 'daily' ? ['daily', 'デイリーで挑戦'] : a.id === 'tutorial' ? ['tutorial', 'チュートリアルを遊ぶ']
+        : ser === 'mission' ? ['goto-daily', 'ミッションを見る'] : ser === 'level' ? ['level', 'レベル報酬を見る'] : ser === 'skins' ? ['view-skin', 'スキンを見る'] : ser === 'streak' ? null : ['endless', 'エンドレスで挑戦'];
+      const series = ACH.filter(x => achSeries(x.id) === ser);
+      return `${sheetHead('実績')}
+        <div class="ad-hero" style="--tc:${tc}">
+          <span class="ad-medal${done ? ' done' : ''}">${done ? I.trophy : I.lock}</span>
+          <div class="ad-title"><span class="tier">${'★'.repeat(a.tier)}<i>${'★'.repeat(5 - a.tier)}</i></span><em>${tl}</em><b>${a.name}</b><p>${a.desc}</p></div>
+        </div>
+        <div class="card ad-prog">
+          <div class="ad-row"><small>${RECORD_LABEL[kind]}</small><b>${kind === 'flag' ? (done ? '達成' : '未達成') : fmt(Math.min(v, t)) + ' / ' + fmt(t)}</b></div>
+          <span class="xpbar"><i style="--p:${Math.round(p * 100)}%"></i></span>
+          <small class="ad-status${done ? ' ok' : ''}">${status}</small>
+        </div>
+        <p class="glabel">報酬</p>
+        <div class="ad-rewards">
+          <div class="card rwbox"><span class="gem big"></span><b>${fmt(a.shards)}</b><small>カケラ</small></div>
+          ${sk ? `<button class="card rwbox skinbox" type="button" data-act="view-skin" data-skin="${sk.id}">${charHTML(sk.id)}<span class="rar ${sk.rar}">${sk.rar}</span><b>${sk.name}</b><small>${owns(sk.id) ? '所持しています' : 'この実績でしか手に入らない'}</small></button>` : ''}
+        </div>
+        ${hint ? `<p class="glabel">コツ</p><p class="tips" style="font-size:.82rem">${hint}</p>` : ''}
+        <div class="stack" style="margin-top:14px">
+          ${claimable ? `<button class="btn3d big wide" type="button" data-act="claim-ach" data-id="${a.id}" data-focus>${I.gift}報酬を受け取る</button>` : ''}
+          ${challenge ? `<button class="btn3d ${claimable ? 'dark ' : ''}wide" type="button" data-act="${challenge[0]}" ${challenge[0] === 'view-skin' ? '' : ''}${claimable ? '' : 'data-focus'}>${I.play}${challenge[1]}</button>` : ''}
+        </div>
+        ${series.length > 1 ? `<p class="glabel">${serName}シリーズ</p>
+        <div class="ad-series">${series.map(x => {
+          const xd = achDone(x), [xt, xc] = TIERS[x.tier];
+          return `<button class="ad-item${x.id === a.id ? ' cur' : ''}${xd ? ' done' : ''}" type="button" data-act="ach-detail" data-id="${x.id}" style="--tc:${xc}"><span class="mini">${xd ? I.check : I.lock}</span><span class="nm">${x.name}<small>${x.desc}</small></span><span class="tier">${'★'.repeat(x.tier)}</span>${achClaimable(x) ? '<span class="badge">!</span>' : ''}</button>`;
+        }).join('')}</div>` : ''}`;
+    },
     level() {
       const lv = save.level, need = needXp(lv);
       const rows = [];
       for (let L = Math.max(2, lv - 1); L <= Math.max(lv + 10, 31); L++) {
         if (L > lv + 10 && !LEVEL_SKINS[L]) continue;
         const r = levelReward(L), got = L <= lv, next = L === lv + 1;
-        rows.push(`<div class="lv-row${got ? ' got' : ''}${next ? ' next' : ''}"><span class="ln">Lv.${L}</span><span class="lv-rw">${gemRw(r.shards)}${r.skin ? `<span class="rw-skin">${skinIcon(r.skin)}${skinOf(r.skin).name}</span>` : ''}</span><span class="lv-st">${got ? I.check : next ? 'つぎ' : ''}</span></div>`);
+        rows.push(`<div class="lv-row${got ? ' got' : ''}${next ? ' next' : ''}"><span class="ln">Lv.${L}</span><span class="lv-rw">${gemRw(r.shards)}${r.skin ? `<button class="rw-skin linkish" type="button" data-act="view-skin" data-skin="${r.skin}">${skinIcon(r.skin)}${skinOf(r.skin).name} ›</button>` : ''}</span><span class="lv-st">${got ? I.check : next ? 'つぎ' : ''}</span></div>`);
       }
       return `${sheetHead('レベル')}
         <div class="card lv-head">${charHTML(save.skin)}<div><b>Lv.${lv}</b><small>${rankFor(save.bestRun.loops)}</small><span class="xpbar"><i style="--p:${Math.round(save.xp / need * 100)}%"></i></span><small>つぎのレベルまで あと ${fmt(need - save.xp)} XP</small></div></div>
@@ -2193,7 +2305,7 @@ body.touch .keyhint { display: none; }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const act = b.dataset.act;
-    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin', 'level', 'equip', 'buy', 'claim-ach', 'claim-mis', 'claim-bonus', 'login-claim'].indexOf(act) < 0) sfx.ui();
+    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin', 'level', 'equip', 'buy', 'claim-ach', 'claim-mis', 'claim-bonus', 'login-claim', 'ach-detail', 'skin-how'].indexOf(act) < 0) sfx.ui();
     if (isTouch()) buzz(5);
     switch (act) {
       case 'tab': if (b.dataset.tab !== tab || view !== 'home') setTab(b.dataset.tab); break;
@@ -2233,9 +2345,24 @@ body.touch .keyhint { display: none; }
       }
       case 'skinfilter': skinFilter = b.dataset.val; setTab('skins', 'keep'); break;
       case 'goto-ach': misView = 'ach'; achFilter = 'all'; setTab('missions'); break;
+      case 'ach-detail': openModal('ach', { id: b.dataset.id }); break;
+      case 'skin-how': {
+        // jump straight to wherever this skin comes from
+        const k = skinOf(b.dataset.skin), a = ACH.find(x => x.skin === k.id);
+        if (a) openModal('ach', { id: a.id });
+        else if (k.src === 'level') openModal('level');
+        else if (k.src === 'login') { misView = 'daily'; setTab('missions'); const ls = pageEl.querySelector('.login-strip'); if (ls) ls.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+        break;
+      }
+      case 'view-skin':
+        if (view !== 'home') break;
+        skinSel = b.dataset.skin || null; skinFilter = 'all';
+        closeModal(); setTab('skins');
+        break;
+      case 'goto-daily': closeModal(); misView = 'daily'; setTab('missions'); break;
       case 'misview': misView = b.dataset.val; setTab('missions', 'keep'); break;
       case 'achfilter': achFilter = b.dataset.val; setTab('missions', 'keep'); break;
-      case 'claim-ach': claimAch(b.dataset.id); refreshPage(); break;
+      case 'claim-ach': claimAch(b.dataset.id); refreshPage(); if (modalKind === 'ach') openModal('ach', { id: b.dataset.id }); break;
       case 'claim-mis': claimMission(Number(b.dataset.i)); refreshPage(); break;
       case 'claim-bonus': claimMissionBonus(); refreshPage(); break;
       case 'login-claim': claimLogin(); if (modalKind === 'login') closeModal(); refreshPage(); break;
@@ -2261,6 +2388,7 @@ body.touch .keyhint { display: none; }
     }
   });
   function refreshPage() { renderProfile(); if (view === 'home') setTab(tab, 'keep'); updateBadges(); }
+  pageEl.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('tappable')) { e.preventDefault(); e.target.click(); } });
   peekBack.addEventListener('click', unpeek);
   function unpeek() {
     if (state !== 'result' || peekBack.hidden) return;
@@ -2316,7 +2444,7 @@ body.touch .keyhint { display: none; }
     if (state === 'resuming') { togglePause(); return; }
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
     if (modalKind === 'settings') { if (modalOpts.from === 'pause') openModal('pause'); else closeModal(); return; }
-    if (modalKind === 'howto' || modalKind === 'level') { closeModal(); return; }
+    if (modalKind === 'howto' || modalKind === 'level' || modalKind === 'ach') { closeModal(); return; }
     if (modalKind === 'login') { claimLogin(); closeModal(); refreshPage(); return; }
     if (modalKind === 'pause') { togglePause(); return; }
     if (modalKind === 'result' || modalKind === 'tutdone') { goHome(); return; }
