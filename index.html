@@ -636,6 +636,16 @@ body.touch .keyhint { display: none; }
 .res-unlock b { color: var(--amber); }
 .res-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .res-actions .btn3d { flex-direction: column; gap: 4px; padding: 10px 6px 9px; font-family: var(--font-ui); font-size: 0.74rem; font-weight: 800; border-radius: 16px; }
+.share-preview { padding: 14px 16px; border-radius: 16px; background: rgba(5, 16, 34, 0.45); font-size: 0.84rem; line-height: 1.7; -webkit-user-select: text; user-select: text; }
+.share-url { font-family: var(--font-mono); font-size: 0.7rem; color: var(--ice); word-break: break-all; }
+.share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; margin: 18px 0 8px; }
+.sns { display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 0; border: 0; background: none; cursor: pointer; color: var(--chalk); text-decoration: none; font-size: 0.7rem; font-weight: 800; }
+.sns-ic { width: 56px; height: 56px; border-radius: 18px; display: grid; place-items: center; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3); transition: transform 0.08s; }
+.sns-ic svg { width: 26px; height: 26px; }
+.sns:active .sns-ic { transform: translateY(3px) scale(0.96); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3); }
+.sns.ok .sns-ic { background: var(--mint) !important; color: var(--bg-1) !important; }
+.share-note { margin: 6px 0 0; text-align: center; font-size: 0.7rem; }
+.res.quiet .stamp, .res.quiet .newbest, .res.quiet .lvup { animation: none; }
 .sharebox { width: 100%; min-height: 5rem; resize: none; padding: 10px; border-radius: 12px; border: 1px solid var(--line); background: rgba(5, 16, 34, 0.4); color: var(--chalk); font-family: var(--font-mono); font-size: 0.74rem; -webkit-user-select: text; user-select: text; }
 
 @media (min-width: 700px) and (min-height: 900px) {
@@ -773,6 +783,7 @@ body.touch .keyhint { display: none; }
     lock: svg('<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'),
     up: svg('<path d="M12 19V5M6 11l6-6 6 6"/>'),
     full: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12v.01"/>'),
     check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
     gift: svg('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-2-4-6-4-6-1.5S9 9 12 9zM12 9c2-4 6-4 6-1.5S15 9 12 9z"/>'),
@@ -817,6 +828,7 @@ body.touch .keyhint { display: none; }
     { id: 'wizard',  name: 'ウィザード',   color: '#7b5cd6', acc: 'hat', eyes: 'sparkle', rar: 'SR', src: 'level' },
     { id: 'royal',   name: 'ロイヤル',     color: '#5a7bff', pat: 'gradient', c2: '#b79bff', acc: 'crown', rar: 'UR', src: 'level' },
     { id: 'aurora',  name: 'オーロラ',     color: '#5fe3b8', pat: 'gradient', c2: '#b79bff', acc: 'halo', rar: 'UR', src: 'level' },
+    { id: 'idol',    name: 'アイドル',     color: '#ff8fd0', pat: 'star', c2: '#fff3a6', acc: 'bow', eyes: 'sparkle', rar: 'SR', src: 'ach' },
     { id: 'sunrise', name: 'サンライズ',   color: '#ff8f5a', pat: 'gradient', c2: '#ffd75e', eyes: 'happy', rar: 'SR', src: 'login' },
   ];
   const RARITY = { N: 'ノーマル', R: 'レア', SR: 'スーパーレア', UR: 'ウルトラレア' };
@@ -873,6 +885,9 @@ body.touch .keyhint { display: none; }
     ['level25',  'レベル25',       'レベル25になる',                          5, 500, null,      () => [save.level, 25]],
     ['skins5',   'コレクター',     'スキンを5種類集める',                     2,  80, null,      () => [ownedCount(), 5]],
     ['skins15',  '大コレクター',   'スキンを15種類集める',                    4, 300, null,      () => [ownedCount(), 15]],
+    ['share1',   'はじめてのシェア', '結果をシェアする',                      1,   0, null,      () => [save.stats.shares, 1]],
+    ['shareDaily','デイリー自慢',  'デイリーチャレンジの結果をシェアする',    2,   0, null,      () => [F('shareDaily'), 1]],
+    ['share5',   '宣伝部長',       '通算5回シェアする',                       2,   0, 'idol',    () => [save.stats.shares, 5]],
   ].map(([id, name, desc, tier, , skin, prog]) => ({ id, name, desc, tier, shards: TIER_SHARDS[tier], skin, prog }));
   // detail sheet: which series an achievement belongs to, what kind of record it tracks, and a hint
   const SERIES = {
@@ -888,6 +903,7 @@ body.touch .keyhint { display: none; }
     plays:   ['プレイ', 'total', '遊ぶたびに増えていく。'],
     mission: ['ミッション', 'total', 'デイリーミッションは毎日3つ。ミッションタブで受け取るとカウントされる。'],
     level:   ['レベル', 'now', 'プレイやミッションの受け取りで XP がたまる。'],
+    share:   ['シェア', 'total', '結果画面や記録タブの「シェア」から、X・LINE などに結果を投稿したり、コピーして送ったりするとカウントされる。'],
     skins:   ['スキン', 'now', 'ショップで買う、実績・レベル報酬・ログインボーナスでもらう、の4通りで集められる。'],
     misc:    ['テクニック', 'flag', ''],
   };
@@ -901,7 +917,7 @@ body.touch .keyhint { display: none; }
     clutch: 'タイムバーが赤くなってからが勝負。残り0.5秒以内にコインに触れよう。',
   };
   const achSeries = id => {
-    const m = id.match(/^(loop|score|near|phase|chain|erase|storm|daily|streak|plays|total|mission|level|skins)/);
+    const m = id.match(/^(loop|score|near|phase|chain|erase|storm|daily|streak|plays|total|mission|level|skins|share)/);
     return m ? (m[1] === 'total' ? 'plays' : m[1]) : 'misc';
   };
   const RECORD_LABEL = { best: '1回のプレイでの最高記録', total: '通算', now: '現在', flag: '達成したかどうか' };
@@ -931,7 +947,7 @@ body.touch .keyhint { display: none; }
   const defaults = () => ({
     best: { endless: 0 },
     daily: { date: '', best: 0, plays: 0 },
-    stats: { plays: 0, loops: 0, coins: 0, nears: 0, phases: 0, ms: 0, dailyPlays: 0, dailyDays: 0, lastDailyDay: '', missions: 0, shardsEarned: 0 },
+    stats: { plays: 0, loops: 0, coins: 0, nears: 0, phases: 0, ms: 0, dailyPlays: 0, dailyDays: 0, lastDailyDay: '', missions: 0, shardsEarned: 0, shares: 0 },
     bestRun: { loops: 0, nears: 0, phases: 0, chain: 0, erases: 0, score: 0, nodash: 0, storms: 0, ghosts: 0 },
     top: { endless: [], daily: [] },
     ach: {}, achClaimed: {}, flags: {},
@@ -1335,7 +1351,8 @@ body.touch .keyhint { display: none; }
     run.done = true;
     checkAch();
     state = 'result'; revealT = 0; shownScore = score;
-    openModal('result', { isBest, xpGain, ups: ups.length, shardGain, missionsDone });
+    lastResult = { isBest, xpGain, ups: ups.length, shardGain, missionsDone };
+    openModal('result', lastResult);
     menuMusic();
   }
 
@@ -1964,13 +1981,14 @@ body.touch .keyhint { display: none; }
           <div class="card"><small>すり抜け</small><b>${fmt(st.phases)}</b></div>
           <div class="card"><small>時間</small><b>${mins}:${pad2(secs)}</b></div>
         </div>
+        <button class="btn3d dark wide" type="button" data-act="share-best" style="margin-top:16px">${I.share}ベスト記録をシェア</button>
         <p class="section-label" style="text-align:center;font-weight:500">記録はこの端末のブラウザにだけ保存されます</p>`;
     },
   };
 
   // ================= modal sheets =================
-  let modalKind = null, modalOpts = {}, shareText = '';
-  const closableByScrim = { settings: 1, howto: 1, pause: 1, level: 1, login: 1, ach: 1 };
+  let modalKind = null, modalOpts = {}, shareText = '', lastResult = null;
+  const closableByScrim = { settings: 1, howto: 1, pause: 1, level: 1, login: 1, ach: 1, share: 1 };
   let closeTimer = 0;
   const modalOpen = () => !modal.hidden && !modal.classList.contains('closing');
   const cardMode = () => matchMedia('(min-width: 700px) and (min-height: 560px)').matches;
@@ -2176,7 +2194,7 @@ body.touch .keyhint { display: none; }
         : done ? `達成！${when(save.ach[a.id]) ? when(save.ach[a.id]) + ' · ' : ''}報酬を受け取れます` : `あと ${fmt(t - Math.min(v, t))}`;
       const sk = a.skin ? skinOf(a.skin) : null;
       const challenge = done ? '' : ser === 'daily' ? ['daily', 'デイリーで挑戦'] : a.id === 'tutorial' ? ['tutorial', 'チュートリアルを遊ぶ']
-        : ser === 'mission' ? ['goto-daily', 'ミッションを見る'] : ser === 'level' ? ['level', 'レベル報酬を見る'] : ser === 'skins' ? ['view-skin', 'スキンを見る'] : ser === 'streak' ? null : ['endless', 'エンドレスで挑戦'];
+        : ser === 'share' ? ['share-best', 'ベスト記録をシェア'] : ser === 'mission' ? ['goto-daily', 'ミッションを見る'] : ser === 'level' ? ['level', 'レベル報酬を見る'] : ser === 'skins' ? ['view-skin', 'スキンを見る'] : ser === 'streak' ? null : ['endless', 'エンドレスで挑戦'];
       const series = ACH.filter(x => achSeries(x.id) === ser);
       return `${sheetHead('実績')}
         <div class="ad-hero" style="--tc:${tc}">
@@ -2231,13 +2249,27 @@ body.touch .keyhint { display: none; }
         <button class="btn3d big wide" type="button" data-act="login-claim" data-focus>${I.gift}受け取る</button>
       </div>`;
     },
+    share(o) {
+      const full = o.text + '\n' + shareLink();
+      const nets = shareNets(o.text);
+      return `${sheetHead('シェア', 'close')}
+        <div class="share-preview" id="sharePreview">${o.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>')}<br><span class="share-url">${shareLink()}</span></div>
+        <div class="share-grid">
+          ${nets.map(n => `<a class="sns" href="${n.href}" target="_blank" rel="noopener noreferrer" data-act="share-go" data-net="${n.id}"><span class="sns-ic" style="background:${n.bg};color:${n.fg}">${n.icon}</span>${n.label}</a>`).join('')}
+          <button class="sns" type="button" data-act="share-copy" id="shareCopy"><span class="sns-ic" style="background:var(--card-hi);color:var(--chalk)">${I.copy}</span><span class="lbl">コピー</span></button>
+          ${navigator.share ? `<button class="sns" type="button" data-act="share-native"><span class="sns-ic" style="background:var(--card-hi);color:var(--chalk)">${I.share}</span>その他</button>` : ''}
+        </div>
+        <textarea class="sharebox" id="shareBox" readonly hidden aria-label="共有用テキスト">${full}</textarea>
+        <p class="share-note muted">アプリが開かないときは「コピー」して貼り付けてください</p>
+        ${o.from === 'result' ? `<button class="btn3d dark wide" type="button" data-act="close" style="margin-top:12px">${I.back}結果にもどる</button>` : ''}`;
+    },
     result(o) {
       const loops = loopN - 1, rank = rankFor(loops);
       let cause = '時間切れ';
       if (killer) { const ago = loopN - killer.n; cause = (ago === 1 ? 'ひとつ前' : ago + 'ループ前') + 'の自分に衝突'; }
       shareText = `エコーラン ${mode === 'daily' ? 'デイリー ' + today() : 'エンドレス'}\n${loops}ループ ${fmt(score)}点 称号「${rank}」\nニアミス${run.nears} すり抜け${run.phases} 最大CHAIN${run.maxChain}\n#エコーラン`;
       const lvBefore = run.startLv;
-      return `<div class="res">
+      return `<div class="res${o.quiet ? ' quiet' : ''}">
         <p class="res-cause">${cause}</p>
         <h2 class="res-title">GAME OVER</h2>
         <div class="res-score"><small>${mode === 'daily' ? 'DAILY ' + shortDate() : 'ENDLESS'} · SCORE</small><b id="resScore">0</b>${o.isBest && score > 0 ? '<span class="newbest">NEW BEST!</span>' : ''}</div>
@@ -2255,10 +2287,9 @@ body.touch .keyhint { display: none; }
         <button class="btn3d big wide" type="button" data-act="retry" data-focus>${I.retry}リトライ</button>
         <div class="res-actions">
           <button class="btn3d dark" type="button" data-act="home">${I.home}ホーム</button>
-          <button class="btn3d dark" type="button" data-act="share" id="shareBtn">${I.share}<span>シェア</span></button>
+          <button class="btn3d dark" type="button" data-act="share" id="shareBtn">${I.share}シェア</button>
           <button class="btn3d dark" type="button" data-act="peek">${I.eye}軌跡</button>
         </div>
-        <textarea class="sharebox" id="shareBox" readonly hidden aria-label="共有用テキスト"></textarea>
       </div>`;
     },
   };
@@ -2279,7 +2310,12 @@ body.touch .keyhint { display: none; }
       };
     },
     result(o) {
-      // score counts up, then the XP bar fills
+      // score counts up, then the XP bar fills (skipped when coming back from the share sheet)
+      if (o.quiet) {
+        $('resScore').textContent = fmt(score); $('resLv').textContent = save.level;
+        const bar = $('resXp'); bar.style.transition = 'none'; bar.style.setProperty('--p', Math.round(save.xp / needXp(save.level) * 100) + '%');
+        return;
+      }
       const el = $('resScore'), t0 = performance.now(), dur = reduceMotion ? 0 : 900;
       let lastTick = 0;
       const stepCount = now => {
@@ -2312,7 +2348,7 @@ body.touch .keyhint { display: none; }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     const act = b.dataset.act;
-    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin', 'level', 'equip', 'buy', 'claim-ach', 'claim-mis', 'claim-bonus', 'login-claim', 'ach-detail', 'skin-how'].indexOf(act) < 0) sfx.ui();
+    if (['tab', 'endless', 'daily', 'retry', 'restart', 'howto', 'settings', 'howto-next', 'tutorial', 'tut-go', 'skip', 'skin', 'level', 'equip', 'buy', 'claim-ach', 'claim-mis', 'claim-bonus', 'login-claim', 'ach-detail', 'skin-how', 'share-go'].indexOf(act) < 0) sfx.ui();
     if (isTouch()) buzz(5);
     switch (act) {
       case 'tab': if (b.dataset.tab !== tab || view !== 'home') setTab(b.dataset.tab); break;
@@ -2381,7 +2417,11 @@ body.touch .keyhint { display: none; }
         setTimeout(() => { if (modalKind === 'settings') b.textContent = document.fullscreenElement ? '元にもどす' : '全画面にする'; }, 300);
         break;
       case 'peek': hideSheet(); peekBack.hidden = false; revealT = 0; peekBack.focus(); break;
-      case 'share': doShare(b); break;
+      case 'share': openShare(shareText, { from: 'result', daily: mode === 'daily' }); break;
+      case 'share-best': openShare(bestShareText(), {}); break;
+      case 'share-go': countShare(); buzz(8); break;   // the link itself opens the app or site
+      case 'share-copy': copyShare(b); break;
+      case 'share-native': navigator.share({ text: modalOpts.text, url: shareLink() }).then(countShare, () => {}); break;
       case 'reset':
         if (Date.now() - resetArmed < 4000) {
           save = defaults(); save.howtoSeen = true; save.tutorialDone = true; save.flags.tutorial = 1; ensureDaily(); persist(); applyVolumes(); applyBodyFlags(); renderProfile(); updateBadges();
@@ -2404,14 +2444,38 @@ body.touch .keyhint { display: none; }
     modal.hidden = false;
     const f = sheet.querySelector('[data-act="peek"]'); if (f) f.focus();
   }
-  function doShare(b) {
-    const label = b.querySelector('span'), box = $('shareBox');
-    const fallback = () => { box.hidden = false; box.value = shareText; box.focus(); box.select(); label.textContent = '下からコピー'; };
-    const copy = () => {
-      try { navigator.clipboard.writeText(shareText).then(() => { label.textContent = 'コピー済み'; }, fallback); } catch (err) { fallback(); }
-    };
-    if (navigator.share && isTouch()) navigator.share({ text: shareText }).catch(err => { if (!err || err.name !== 'AbortError') copy(); });
-    else copy();
+  // ---- sharing ----
+  // the published game: its own address when hosted (e.g. GitHub Pages), otherwise the public artifact link
+  const PUBLIC_URL = 'https://claude.ai/artifact/MABDxiq7x4ukWfNh8pLHFc';
+  const shareLink = () => (location.protocol === 'https:' && !/claude/.test(location.hostname)) ? location.origin + location.pathname : PUBLIC_URL;
+  function shareNets(text) {
+    const u = shareLink(), e = encodeURIComponent, full = text + '\n' + u;
+    return [
+      { id: 'x',        label: 'X',        bg: '#000000', fg: '#ffffff', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8zm-1.1 16.2h1.7L7.4 4.7H5.6z"/></svg>', href: `https://x.com/intent/post?text=${e(text)}&url=${e(u)}` },
+      { id: 'line',     label: 'LINE',     bg: '#06c755', fg: '#ffffff', icon: '<b style="font-size:.62rem;font-weight:800">LINE</b>', href: `https://line.me/R/share?text=${e(full)}` },
+      { id: 'facebook', label: 'Facebook', bg: '#1877f2', fg: '#ffffff', icon: '<b style="font-size:1.3rem;font-weight:800;font-family:Arial,sans-serif">f</b>', href: `https://www.facebook.com/sharer/sharer.php?u=${e(u)}&quote=${e(text)}` },
+      { id: 'threads',  label: 'Threads',  bg: '#101010', fg: '#ffffff', icon: '<b style="font-size:1.2rem;font-weight:800">@</b>', href: `https://www.threads.net/intent/post?text=${e(full)}` },
+      { id: 'bluesky',  label: 'Bluesky',  bg: '#1185fe', fg: '#ffffff', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.3 4.3C8.6 6 11 9.5 12 11.4c1-1.9 3.4-5.4 5.7-7.1 1.6-1.2 4.3-2.2 4.3.9 0 .6-.4 5.2-.6 6-.7 2.6-3.3 3.3-5.7 2.9 4.1.7 5.2 3 2.9 5.4-4.3 4.4-6.2-1.1-6.6-2.5L12 16l-.1.1c-.4 1.4-2.3 6.9-6.6 2.5-2.3-2.4-1.2-4.7 2.9-5.4-2.4.4-5-.3-5.7-2.9C2.4 9.4 2 4.8 2 4.2c0-3.1 2.7-2.1 4.3-.9z"/></svg>', href: `https://bsky.app/intent/compose?text=${e(full)}` },
+    ];
+  }
+  function openShare(text, opts) { openModal('share', Object.assign({ text }, opts || {})); }
+  function bestShareText() {
+    return `エコーラン ベスト記録\nエンドレス ${fmt(save.best.endless)}点・最高${save.bestRun.loops}ループ 称号「${rankFor(save.bestRun.loops)}」\nLv.${save.level} 実績 ${ACH.filter(achDone).length}/${ACH.length}\n#エコーラン`;
+  }
+  // counts a share once per sheet, so tapping several apps in a row is one share
+  function countShare() {
+    if (modalOpts.counted) return;
+    modalOpts.counted = true;
+    save.stats.shares++;
+    if (modalOpts.daily) save.flags.shareDaily = 1;
+    persist(); checkAch(); updateBadges();
+    toast(I.share, 'シェアありがとう！', 'エコーランを広めてくれてうれしい');
+  }
+  function copyShare(b) {
+    const box = $('shareBox'), label = b.querySelector('.lbl');
+    const done = () => { label.textContent = 'コピー済み'; b.classList.add('ok'); countShare(); };
+    const fallback = () => { box.hidden = false; box.focus(); box.select(); label.textContent = '下を長押し'; try { if (document.execCommand('copy')) done(); } catch (err) {} };
+    try { navigator.clipboard.writeText(box.value).then(done, fallback); } catch (err) { fallback(); }
   }
   sheet.addEventListener('input', e => {
     const k = e.target.dataset && e.target.dataset.set;
@@ -2451,6 +2515,7 @@ body.touch .keyhint { display: none; }
     if (state === 'resuming') { togglePause(); return; }
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
     if (modalKind === 'settings') { if (modalOpts.from === 'pause') openModal('pause'); else closeModal(); return; }
+    if (modalKind === 'share') { if (modalOpts.from === 'result' && state === 'result') openModal('result', Object.assign({}, lastResult, { quiet: true })); else closeModal(); return; }
     if (modalKind === 'howto' || modalKind === 'level' || modalKind === 'ach') { closeModal(); return; }
     if (modalKind === 'login') { claimLogin(); closeModal(); refreshPage(); return; }
     if (modalKind === 'pause') { togglePause(); return; }
