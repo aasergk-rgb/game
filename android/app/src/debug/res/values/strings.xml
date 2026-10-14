@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <!-- test builds install next to the Google Play version, under their own name -->
+    <string name="app_name">エコーラン β</string>
+    <string name="title_activity_main">エコーラン β</string>
+</resources>

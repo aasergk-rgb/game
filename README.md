@@ -136,6 +136,8 @@ Web 版と同じ `index.html` を [Capacitor](https://capacitorjs.com/) で包�
 2. 下の **Artifacts** から `echorun-android-…` をダウンロードして展開する。
 3. `echorun-…-debug.apk` をスマホに送ってタップ（「提供元不明のアプリ」のインストールを許可する）。
 
+テスト版（debug）は「エコーラン β」という名前で、アプリ ID は `io.github.aasergkrgb.echorun.debug` です。Google Play 版とは別のアプリとして並べて入れられます。テスト版はどのビルドも同じ鍵（`android/app/debug.keystore`、テスト専用）で署名しているので、新しい APK を上から入れればそのまま更新されます（記録も引き継がれる）。
+
 #### 手元でビルドする
 
 Node.js 22 以上、JDK 21、Android SDK（Android Studio）が必要です。

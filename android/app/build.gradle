@@ -20,6 +20,14 @@ android {
     // release signing comes from the environment (GitHub Actions secrets); without it only debug builds are signed
     def keystore = System.getenv('ANDROID_KEYSTORE_FILE')
     signingConfigs {
+        // one shared key for test builds, so each new APK installs over the last one
+        // (otherwise every CI machine signs with its own random debug key and updates fail)
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         if (keystore) {
             release {
                 storeFile file(keystore)
@@ -30,6 +38,10 @@ android {
         }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+        }
         release {
             if (keystore) signingConfig signingConfigs.release
             minifyEnabled false
