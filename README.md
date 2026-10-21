@@ -182,7 +182,7 @@ npm run android:open      # Android Studio で開く（エミュレーターや�
 - 届いたフィードバックは、開発者の Google Apps Script（[`feedback-server/`](feedback-server/README.md)）が Gemini で重要度を判定し、スプレッドシートに記録してメールで知らせる。**緊急はすぐ、重要（高）は毎朝のまとめ、改善の参考（中）と感想（低）は毎週月曜のまとめ**。
 - Gemini の API キーはサーバー側（スクリプト プロパティ）にだけ置き、アプリやリポジトリには入れない。
 - オフラインで送ったものは端末に保存し、次に起動したときやネットにつながったときに自動で送る。連続送信は20秒あける。
-- 有効にするには、`feedback-server/README.md` の手順でサーバーを用意し、`index.html` の `const FEEDBACK_URL = '';` にウェブアプリの URL を入れる（空のあいだはフィードバックの項目を表示しない）。
+- 送り先は `index.html` の `const FEEDBACK_URL` に設定済み（Apps Script のウェブアプリの URL）。サーバーを作り直して URL が変わったときはここを書き換える（空にするとフィードバックの項目は表示されない）。
 
 ## 公開（GitHub Pages）
 
