@@ -27,7 +27,7 @@ jobs:
       - name: Collect the site
         run: |
           mkdir _site
-          cp -r index.html sw.js manifest.webmanifest icon.svg icon-*.png apple-touch-icon.png fonts screenshots _site/
+          cp -r index.html privacy.html sw.js manifest.webmanifest icon.svg icon-*.png apple-touch-icon.png fonts screenshots _site/
           sed -i "s/^const VERSION = 'dev';/const VERSION = '${GITHUB_SHA::8}';/" _site/sw.js
           grep -q "${GITHUB_SHA::8}" _site/sw.js
       - uses: actions/configure-pages@v5

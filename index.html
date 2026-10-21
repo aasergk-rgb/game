@@ -370,6 +370,11 @@ body.lefty .dash { right: auto; left: 22px; }
 .skillbtn.full::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid var(--ice); animation: ring 1.1s ease-out infinite; pointer-events: none; }
 .skillbtn.hit > span { transform: scale(0.9); }
 body.lefty .skillbtn { right: auto; left: 40px; }
+/* portrait: the arena reaches down to just above DASH, so SKILL sits beside DASH instead of above it */
+@media (orientation: portrait) {
+  .skillbtn { right: 148px; bottom: calc(44px + var(--safe-b)); }
+  body.lefty .skillbtn { right: auto; left: 148px; }
+}
 body:not(.touch) .stick-hint, body:not(.touch) .dash, body:not(.touch) .skillbtn { display: none; }
 .keyhint { position: absolute; left: 0; right: 0; bottom: 8px; margin: 0; text-align: center; font-size: 0.7rem; color: var(--chalk-dim); pointer-events: none; }
 body.touch .keyhint { display: none; }
@@ -653,6 +658,23 @@ body.touch .keyhint { display: none; }
 .seg button[aria-pressed="true"] { background: var(--amber); color: var(--bg-1); }
 .textbtn { border: 0; background: none; padding: 6px 0; cursor: pointer; font-size: 0.84rem; font-weight: 800; color: var(--amber); }
 .textbtn.danger { color: var(--coral); }
+/* feedback form */
+.fb-lead { margin: 0 0 12px; font-size: 0.82rem; line-height: 1.6; }
+.fb-field { position: relative; display: block; margin: 0 0 10px; }
+.fb-field textarea, .fb-input {
+  display: block; width: 100%; box-sizing: border-box; border: 2px solid var(--line); border-radius: 14px;
+  background: rgba(5, 16, 34, 0.45); color: var(--chalk); font: inherit; font-size: 1rem; line-height: 1.6; padding: 12px 14px;
+}
+.fb-field textarea { min-height: 140px; resize: vertical; padding-bottom: 28px; }
+.fb-field textarea:focus, .fb-input:focus { outline: none; border-color: var(--amber); }
+.fb-field textarea::placeholder, .fb-input::placeholder { color: var(--chalk-dim); opacity: 0.8; }
+.fb-count { position: absolute; right: 14px; bottom: 9px; font-family: var(--font-mono); font-size: 0.66rem; color: var(--chalk-dim); pointer-events: none; }
+.fb-input { margin: 0 0 12px; font-size: 1rem; }
+.fb-opt { margin: 0 0 10px; }
+.fb-note { margin: 0 4px 14px; font-size: 0.7rem; line-height: 1.6; color: var(--chalk-dim); }
+.fb-note a { color: var(--amber); font-weight: 800; }
+a.textbtn { text-decoration: none; }
+.ver { margin: 16px 0 4px; text-align: center; font-family: var(--font-mono); font-size: 0.66rem; color: var(--chalk-dim); letter-spacing: 0.06em; }
 
 /* how-to carousel */
 .carousel { display: flex; margin: 0 -18px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x; }
@@ -740,6 +762,7 @@ body.touch .keyhint { display: none; }
   .play-btn .pb-main { font-size: 1.5rem; }
   .tab { flex-direction: row; justify-content: center; gap: 6px; padding: 2px 0; }
   .tab .ic { width: 40px; height: 28px; }
+  .tab .badge { position: static; margin-left: 2px; }
   .ghud { padding-top: calc(6px + var(--safe-t)); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -868,6 +891,8 @@ body.touch .keyhint { display: none; }
     copy: svg('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'),
     target: svg('<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12v.01"/>'),
     check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    send: svg('<path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>'),
+    mail: svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6 8.5-6"/>'),
     gift: svg('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11"/><path d="M12 9c-2-4-6-4-6-1.5S9 9 12 9zM12 9c2-4 6-4 6-1.5S15 9 12 9z"/>'),
     bag: svg('<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'),
     cal: d => `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><rect x="7" y="10" width="34" height="31" rx="5"/><path d="M7 19h34M16 6v8M32 6v8"/><text x="24" y="36.5" text-anchor="middle" font-size="14" font-weight="800" fill="currentColor" stroke="none" font-family="sans-serif">${d}</text></svg>`,
@@ -1083,17 +1108,24 @@ body.touch .keyhint { display: none; }
     missions: { date: '', list: [], bonus: false },
     login: { last: '', streak: 0, best: 0, total: 0, claimed: '' },
     tutorial: false, howtoSeen: false, tutorialDone: false, tips: {},
+    fid: '',
     settings: {
       bgm: 0.5, sfx: 0.8, muted: false,
       shake: !reduceMotion, flash: !reduceMotion, preview: true, hitbox: false,
       control: 'keys', stick: 0.5, lefty: false, haptics: true,
     },
   });
+  // copies a saved value only when it has the same shape as the default, so a damaged save
+  // (a null, a string where a number belongs) can never stop the game from starting
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
   function merge(a, b) {
+    if (!isObj(b)) return a;
     for (const k in b) {
+      if (!(k in a)) continue;
       const av = a[k], bv = b[k];
-      if (av && bv && typeof av === 'object' && typeof bv === 'object' && !Array.isArray(av) && !Array.isArray(bv)) merge(av, bv);
-      else if (k in a) a[k] = bv;
+      if (isObj(av)) { if (isObj(bv)) merge(av, bv); }
+      else if (Array.isArray(av)) { if (Array.isArray(bv)) a[k] = bv; }
+      else if (typeof av === typeof bv && (typeof bv !== 'number' || Number.isFinite(bv))) a[k] = bv;
     }
     return a;
   }
@@ -2010,6 +2042,7 @@ body.touch .keyhint { display: none; }
     initAudio(); sfx.open();
     goHome();
     checkLogin();
+    flushFeedback();
     if (loginPending()) setTimeout(() => { if (view === 'home' && !modalOpen()) openModal('login'); }, 450);
   }
   function goHome() {
@@ -2406,10 +2439,28 @@ body.touch .keyhint { display: none; }
           <div class="srow"><span>チュートリアル<small>操作を一から練習する</small></span><button class="textbtn" type="button" data-act="tutorial">もう一度</button></div>
         </div>
         ${installRow() ? `<p class="glabel">アプリ</p><div class="group">${installRow()}</div>` : ''}
+        ${feedbackOn() ? `<p class="glabel">サポート</p>
+        <div class="group">
+          <div class="srow"><span>フィードバックを送る<small>不具合の報告・ほしい機能・感想など</small></span><button class="textbtn" type="button" data-act="feedback">送る</button></div>
+        </div>` : ''}
         <p class="glabel">データ</p>
         <div class="group">
           <div class="srow"><span>記録と実績を消す<small>この端末に保存したデータをすべて消去</small></span><button class="textbtn danger" type="button" data-act="reset" id="resetBtn">消去</button></div>
-        </div>`;
+          <div class="srow"><span>プライバシーポリシー<small>保存するデータと送るデータについて</small></span><a class="textbtn" href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer">見る</a></div>
+        </div>
+        <p class="ver" id="verLine">エコーラン · ${NATIVE ? 'Android アプリ' : PWA && standalone() ? 'インストール版' : 'Web 版'}</p>`;
+    },
+    feedback() {
+      const d = fbDraft;
+      const cats = Object.entries(FB_CATS);
+      return `${sheetHead('フィードバック', 'fb-back')}
+        <p class="muted fb-lead">不具合の報告、ほしい機能、感想など、なんでもどうぞ。開発者がすべて読んでいます。</p>
+        <div class="segbar" role="group" aria-label="種類">${cats.map(([v, c]) => `<button type="button" data-act="fb-cat" data-val="${v}" aria-pressed="${d.category === v}">${c[0]}</button>`).join('')}</div>
+        <label class="fb-field"><textarea id="fbText" maxlength="${FB_MAX}" rows="6" placeholder="${FB_CATS[d.category][1]}" aria-label="内容">${escHTML(d.text)}</textarea><span class="fb-count" id="fbCount">${d.text.length} / ${FB_MAX}</span></label>
+        <input class="fb-input" id="fbMail" type="email" inputmode="email" autocomplete="email" maxlength="120" placeholder="返信がほしいときはメールアドレス（任意）" aria-label="返信用のメールアドレス（任意）" value="${escHTML(d.email)}">
+        <div class="group fb-opt"><label class="srow"><span>端末情報もいっしょに送る<small>アプリの版・OS・画面サイズ・レベルなど。不具合の調査に使います</small></span><input class="switch" type="checkbox" id="fbMeta" ${d.meta ? 'checked' : ''}></label></div>
+        <p class="fb-note">送った内容は開発者が読み、ゲームの改善に使います。重要度の仕分けに Google の AI（Gemini）を使います。名前や住所などの個人情報は書かないでください。<a href="${PRIVACY_URL}" target="_blank" rel="noopener noreferrer">プライバシーポリシー</a></p>
+        <button class="btn3d wide" type="button" data-act="fb-send" id="fbSend">${I.send}<span class="lbl">送信する</span></button>`;
     },
     howto(o) {
       const slides = howtoSlides();
@@ -2563,6 +2614,11 @@ body.touch .keyhint { display: none; }
     },
   };
   const AFTER = {
+    settings() {
+      // the app shows its build number, which helps when someone reports a bug
+      const app = plug('App');
+      if (app && app.getInfo) app.getInfo().then(i => { const v = $('verLine'); if (v && i && i.version) v.textContent = 'エコーラン · Android アプリ ' + i.version; }, () => {});
+    },
     share(o) {
       makeShareCard(o.card).then(blob => {
         if (modalKind !== 'share' || modalOpts !== o) return;
@@ -2645,6 +2701,16 @@ body.touch .keyhint { display: none; }
       case 'home': goHome(); break;
       case 'howto': openModal('howto', {}); break;
       case 'settings': openModal('settings', { from: modalKind === 'pause' ? 'pause' : null }); break;
+      case 'feedback': openModal('feedback', { from: modalOpts.from }); break;
+      case 'fb-back': openModal('settings', { from: modalOpts.from }); break;
+      case 'fb-cat': {
+        fbDraft.category = b.dataset.val;
+        for (const x of sheet.querySelectorAll('[data-act="fb-cat"]')) x.setAttribute('aria-pressed', x === b);
+        $('fbText').placeholder = FB_CATS[fbDraft.category][1];
+        sfx.ui();
+        break;
+      }
+      case 'fb-send': sendFeedback(b); break;
       case 'close': goBack(); break;
       case 'skin': {
         // tapping an owned skin equips it; tapping any other skin previews it with how to get it
@@ -2747,7 +2813,109 @@ body.touch .keyhint { display: none; }
   // ---- sharing ----
   // the published game: its own address when hosted (e.g. GitHub Pages), otherwise the public artifact link
   const PUBLIC_URL = 'https://claude.ai/artifact/MABDxiq7x4ukWfNh8pLHFc';
-  const shareLink = () => (!NATIVE && location.protocol === 'https:' && !/claude/.test(location.hostname)) ? location.origin + location.pathname : PUBLIC_URL;
+  const PRIVACY_URL = 'https://aasergk-rgb.github.io/game/privacy.html';
+
+  // ================= feedback =================
+  // Sent to the developer's Google Apps Script web app (feedback-server/), which rates it with Gemini and
+  // mails the developer. The API key lives only on that server. Empty URL = the feature stays hidden.
+  const FEEDBACK_URL = '';
+  const FB_MAX = 1000, FB_QUEUE = 'echorun-feedback-queue';
+  const FB_CATS = {
+    bug: ['不具合', 'どの画面で、何をしたら、どうなったか（例：スキル画面で装備したら固まった）'],
+    idea: ['要望', 'ほしい機能、スキン、モード、調整してほしいところなど'],
+    praise: ['感想', '楽しかったところ、気になったところなど'],
+    other: ['その他', 'なんでもどうぞ'],
+  };
+  const freshDraft = () => ({ category: 'bug', text: '', email: '', meta: true });
+  let fbDraft = freshDraft(), fbLast = 0;
+  const escHTML = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const feedbackOn = () => !!FEEDBACK_URL && !/claude/.test(location.hostname);
+  function fbDevice() {
+    // a random id, only so the server can stop one device from flooding it
+    if (!save.fid) { save.fid = Array.from(crypto.getRandomValues(new Uint8Array(12)), x => x.toString(16).padStart(2, '0')).join(''); persist(); }
+    return save.fid;
+  }
+  async function fbPayload(d) {
+    let version = '';
+    const app = plug('App');
+    if (app && app.getInfo) { try { version = (await app.getInfo()).version || ''; } catch (e) {} }
+    return {
+      device: fbDevice(), category: d.category, text: d.text.trim().slice(0, FB_MAX), email: d.email.trim(),
+      app: NATIVE ? 'android' : PWA && standalone() ? 'pwa' : 'web', version,
+      meta: d.meta ? {
+        ua: navigator.userAgent, screen: innerWidth + 'x' + innerHeight + '@' + Math.round((devicePixelRatio || 1) * 10) / 10,
+        lang: navigator.language, level: save.level, best: save.bestRun.loops, plays: save.stats.plays,
+      } : null,
+    };
+  }
+  // 'ok' | 'rate' | 'invalid' | 'fail' (no network, server down: worth retrying later)
+  async function postFeedback(p) {
+    const body = JSON.stringify(p);
+    try {
+      let r;
+      const http = plug('CapacitorHttp');
+      if (http) {   // the app talks to the server natively, so no browser CORS rules get in the way
+        const res = await http.request({ url: FEEDBACK_URL, method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, data: body, connectTimeout: 15000, readTimeout: 30000 });
+        r = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+      } else {
+        // text/plain keeps this a "simple" request: Apps Script cannot answer a CORS preflight
+        const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 30000);
+        const res = await fetch(FEEDBACK_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body, signal: ctl.signal });
+        clearTimeout(timer);
+        r = await res.json();
+      }
+      if (r && r.ok) return 'ok';
+      return r && r.error === 'rate_limited' ? 'rate' : r && r.error === 'invalid' ? 'invalid' : 'fail';
+    } catch (e) {
+      return 'fail';
+    }
+  }
+  const fbQueue = () => { try { return JSON.parse(localStorage.getItem(FB_QUEUE)) || []; } catch (e) { return []; } };
+  const fbSaveQueue = q => { try { if (q.length) localStorage.setItem(FB_QUEUE, JSON.stringify(q.slice(-5))); else localStorage.removeItem(FB_QUEUE); } catch (e) {} };
+  async function sendFeedback(b) {
+    const d = fbDraft, label = b.querySelector('.lbl');
+    if (d.text.trim().length < 2) { toast(I.mail, '内容を書いてください', ''); $('fbText').focus(); return; }
+    if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim())) { toast(I.mail, 'メールアドレスを確認してください', '返信がいらなければ空のままで大丈夫'); $('fbMail').focus(); return; }
+    if (Date.now() - fbLast < 20000) { toast(I.mail, '少し待ってから送ってね', '続けて送れるのは20秒あとから'); return; }
+    b.disabled = true; label.textContent = '送信中…';
+    const p = await fbPayload(d);
+    const r = await postFeedback(p);
+    if (r === 'rate' || r === 'invalid') {
+      b.disabled = false; label.textContent = '送信する';
+      if (r === 'rate') toast(I.mail, '送信が多すぎます', '1時間ほどあけてからお願いします');
+      else toast(I.mail, '送れませんでした', '内容を確認してください');
+      return;
+    }
+    fbLast = Date.now();
+    if (r === 'fail') fbSaveQueue(fbQueue().concat([p]));   // offline or server trouble: send it later
+    fbDraft = freshDraft();
+    if (modalKind === 'feedback') openModal('settings', { from: modalOpts.from });
+    sfx.ach(); buzz(12);
+    if (r === 'ok') toast(I.check, 'フィードバックを送りました', 'ありがとうございます！');
+    else toast(I.mail, 'あとで送ります', 'ネットにつながったときに自動で送信します');
+  }
+  // feedback written offline goes out at the next launch or when the connection comes back
+  let fbFlushing = false;
+  async function flushFeedback() {
+    if (fbFlushing || !feedbackOn()) return;
+    const q = fbQueue();
+    if (!q.length) return;
+    fbFlushing = true;
+    const left = [];
+    let sent = 0;
+    for (const p of q) {
+      const r = await postFeedback(p);
+      if (r === 'ok') sent++;
+      else if (r === 'fail' || r === 'rate') left.push(p);
+    }
+    fbSaveQueue(left);
+    fbFlushing = false;
+    if (sent) toast(I.check, '予約していたフィードバックを送りました', 'ありがとうございます！');
+  }
+  addEventListener('online', () => flushFeedback());
+  // the app shares its Google Play page; the website shares itself; the Claude preview shares its public link
+  const PLAY_URL = 'https://play.google.com/store/apps/details?id=io.github.aasergkrgb.echorun';
+  const shareLink = () => NATIVE ? PLAY_URL : (location.protocol === 'https:' && !/claude/.test(location.hostname)) ? location.origin + location.pathname : PUBLIC_URL;
   function shareNets(text) {
     const u = shareLink(), e = encodeURIComponent, full = text + '\n' + u;
     return [
@@ -2939,6 +3107,10 @@ body.touch .keyhint { display: none; }
     try { navigator.clipboard.writeText(box.value).then(done, fallback); } catch (err) { fallback(); }
   }
   sheet.addEventListener('input', e => {
+    const id = e.target.id;
+    if (id === 'fbText') { fbDraft.text = e.target.value; $('fbCount').textContent = e.target.value.length + ' / ' + FB_MAX; return; }
+    if (id === 'fbMail') { fbDraft.email = e.target.value; return; }
+    if (id === 'fbMeta') { fbDraft.meta = e.target.checked; return; }
     const k = e.target.dataset && e.target.dataset.set;
     if (!k) return;
     if (k === 'sound') save.settings.muted = !e.target.checked;
@@ -2978,6 +3150,7 @@ body.touch .keyhint { display: none; }
     if (state === 'result' && !peekBack.hidden) { unpeek(); return; }
     if (modalKind === 'settings') { if (modalOpts.from === 'pause') openModal('pause'); else closeModal(); return; }
     if (modalKind === 'share') { if (modalOpts.from === 'result' && state === 'result') openModal('result', Object.assign({}, lastResult, { quiet: true })); else closeModal(); return; }
+    if (modalKind === 'feedback') { openModal('settings', { from: modalOpts.from }); return; }
     if (modalKind === 'howto' || modalKind === 'level' || modalKind === 'ach') { closeModal(); return; }
     if (modalKind === 'login') { claimLogin(); closeModal(); refreshPage(); return; }
     if (modalKind === 'pause') { togglePause(); return; }
@@ -3021,7 +3194,7 @@ body.touch .keyhint { display: none; }
     const tag = e.target && e.target.tagName;
     if (view === 'boot') { if (!['shift', 'control', 'alt', 'meta', 'tab'].includes(k)) { e.preventDefault(); leaveBoot(); } return; }
     if (tag === 'INPUT' && e.target.type === 'range' && ['arrowleft', 'arrowright'].includes(k)) return;
-    if (tag === 'TEXTAREA') { if (k === 'escape') goBack(); return; }
+    if (tag === 'TEXTAREA' || (tag === 'INPUT' && /^(text|email|search|url)$/.test(e.target.type))) { if (k === 'escape') goBack(); return; }
     const onButton = tag === 'BUTTON' || tag === 'INPUT';
     const arrow = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k);
     if ((arrow || k === ' ') && (active() || !onButton)) e.preventDefault();

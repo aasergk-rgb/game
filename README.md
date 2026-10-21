@@ -152,7 +152,7 @@ npm run android:open      # Android Studio で開く（エミュレーターや�
 
 #### Google Play で公開する
 
-1. 署名用の鍵を作る（**なくすとアプリを更新できなくなる**ので、安全な場所にバックアップする）：
+1. アップロード用の署名鍵を作る（Play Console の「Play アプリ署名」を使えば、なくしても Google に申請して作り直せる。それでもバックアップしておく）：
    ```sh
    keytool -genkeypair -v -keystore echorun-release.jks -alias echorun -keyalg RSA -keysize 2048 -validity 10000
    ```
@@ -167,12 +167,22 @@ npm run android:open      # Android Studio で開く（エミュレーターや�
 
 3. 次のビルドから、署名済みの `echorun-….aab`（Google Play 用）と `echorun-….apk` も Artifacts に入る。`v1.0.0` のようなタグを push すると、GitHub の Releases にも APK が添付される。
 4. [Google Play Console](https://play.google.com/console) でアプリを作り、`.aab` をアップロードする。バージョン番号（versionCode）は Actions の実行番号で自動的に増える。
+5. ストアの説明文・画像・データ セーフティなどの申告内容は [`store/README.md`](store/README.md) にまとめてある（フィーチャー グラフィック、1080×1920 のスクリーンショット、タブレット用の画像も `store/` にある）。
 
 アプリ ID は `io.github.aasergkrgb.echorun`（`capacitor.config.json` と `android/app/build.gradle`）。Google Play に一度公開すると変えられないので、変えるなら最初の公開の前に。
 
 ## 設定
 
-サウンド（全体のオンオフ、BGM、効果音）、スティック感度、左利きレイアウト、振動、PCの移動方式、予知ドット、画面の揺れ、フラッシュ演出、当たり判定の表示、全画面表示を変更できます。OS でアニメーションを減らす設定にしていると、揺れとフラッシュは最初からオフになります。
+サウンド（全体のオンオフ、BGM、効果音）、スティック感度、左利きレイアウト、振動、PCの移動方式、予知ドット、画面の揺れ、フラッシュ演出、当たり判定の表示、全画面表示を変更できます。OS でアニメーションを減らす設定にしていると、揺れとフラッシュは最初からオフになります。設定のいちばん下に、アプリのバージョンとプライバシーポリシー（`privacy.html`）へのリンクがあります。
+
+## フィードバック
+
+設定の **フィードバックを送る** から、種類（不具合・要望・感想・その他）と本文、返信用のメールアドレス（任意）、端末情報（オンオフできる）を開発者に送れます。
+
+- 届いたフィードバックは、開発者の Google Apps Script（[`feedback-server/`](feedback-server/README.md)）が Gemini で重要度を判定し、スプレッドシートに記録してメールで知らせる。**緊急はすぐ、重要（高）は毎朝のまとめ、改善の参考（中）と感想（低）は毎週月曜のまとめ**。
+- Gemini の API キーはサーバー側（スクリプト プロパティ）にだけ置き、アプリやリポジトリには入れない。
+- オフラインで送ったものは端末に保存し、次に起動したときやネットにつながったときに自動で送る。連続送信は20秒あける。
+- 有効にするには、`feedback-server/README.md` の手順でサーバーを用意し、`index.html` の `const FEEDBACK_URL = '';` にウェブアプリの URL を入れる（空のあいだはフィードバックの項目を表示しない）。
 
 ## 公開（GitHub Pages）
 
@@ -180,7 +190,7 @@ npm run android:open      # Android Studio で開く（エミュレーターや�
 
 1. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** にする。
 2. このブランチを `main` にマージする（または Actions タブから手動実行）。
-3. `https://<ユーザー名>.github.io/<リポジトリ名>/` で公開される。
+3. `https://<ユーザー名>.github.io/<リポジトリ名>/` で公開される。プライバシーポリシーは `…/privacy.html`（Google Play の申告に使う）。
 
 ## 技術メモ
 

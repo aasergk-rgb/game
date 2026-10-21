@@ -31,9 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       VERSION_CODE: ${{ github.run_number }}
-      VERSION_NAME: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('1.0.{0}', github.run_number) }}
     steps:
       - uses: actions/checkout@v4
+      # tag v1.2.0 → version 1.2.0; any other push → 1.0.<run number>
+      - name: Version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then v="${GITHUB_REF_NAME#v}"; else v="1.0.$GITHUB_RUN_NUMBER"; fi
+          echo "VERSION_NAME=$v" >> "$GITHUB_ENV"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
