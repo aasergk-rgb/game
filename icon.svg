@@ -1,8 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#17407a"/>
-  <path d="M0 128h512M0 256h512M0 384h512M128 0v512M256 0v512M384 0v512" stroke="#eaf1f8" stroke-opacity=".08" stroke-width="4"/>
-  <circle cx="196" cy="280" r="110" fill="#eaf1f8" fill-opacity=".1" stroke="#eaf1f8" stroke-width="16" stroke-dasharray="34 26"/>
-  <circle cx="306" cy="244" r="122" fill="#ffb627"/>
-  <circle cx="270" cy="226" r="20" fill="#0d2546"/>
-  <circle cx="342" cy="226" r="20" fill="#0d2546"/>
+  <defs>
+    <pattern id="d1" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="4.2" fill="#1f2a5c"/></pattern>
+    <pattern id="d2" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="3.4" fill="#1f2a5c"/></pattern>
+  </defs>
+  <rect width="512" height="512" fill="#efe9dc"/>
+  <circle cx="132" cy="300" r="86" fill="#f9f6ee"/>
+  <circle cx="132" cy="300" r="86" fill="url(#d2)"/>
+  <circle cx="132" cy="300" r="86" fill="none" stroke="#1f2a5c" stroke-width="12" stroke-dasharray="1 22" stroke-linecap="round"/>
+  <circle cx="214" cy="270" r="96" fill="#f9f6ee"/>
+  <circle cx="214" cy="270" r="96" fill="url(#d1)"/>
+  <circle cx="214" cy="270" r="96" fill="none" stroke="#1f2a5c" stroke-width="12"/>
+  <circle cx="340" cy="250" r="118" fill="#1f2a5c"/>
+  <circle cx="326" cy="236" r="118" fill="#ffc21a" stroke="#1f2a5c" stroke-width="14"/>
+  <circle cx="290" cy="220" r="19" fill="#1f2a5c"/>
+  <circle cx="360" cy="220" r="19" fill="#1f2a5c"/>
 </svg>

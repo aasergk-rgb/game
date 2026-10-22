@@ -2,9 +2,9 @@
   "appId": "io.github.aasergkrgb.echorun",
   "appName": "エコーラン",
   "webDir": "www",
-  "backgroundColor": "#0d2546",
+  "backgroundColor": "#efe9dc",
   "android": {
-    "backgroundColor": "#0d2546",
+    "backgroundColor": "#efe9dc",
     "allowMixedContent": false,
     "webContentsDebuggingEnabled": false
   },
@@ -12,7 +12,7 @@
     "SystemBars": {
       "insetsHandling": "css",
       "initialViewportFitValueHint": "cover",
-      "style": "DARK"
+      "style": "LIGHT"
     }
   }
 }
