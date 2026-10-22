@@ -90,6 +90,7 @@ svg { display: block; }
   transition: transform 0.07s ease, box-shadow 0.07s ease;
   touch-action: manipulation;
 }
+.btn3d:focus-visible { outline: none; box-shadow: var(--off) var(--off) 0 var(--red); }   /* keyboard focus: the offset plate prints in red */
 /* pressing lands the button on its own shadow: the two plates line up */
 .btn3d:active, .btn3d.press { transform: translate(var(--off), var(--off)); box-shadow: 0 0 0 var(--d); }
 .btn3d svg { width: 22px; height: 22px; }
@@ -728,6 +729,17 @@ a.textbtn { text-decoration: underline; text-decoration-thickness: 2px; text-und
 .res-unlock b { color: var(--navy); }
 .res-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .res-actions .btn3d { flex-direction: column; gap: 4px; padding: 10px 6px 9px; font-family: var(--font-ui); font-size: 0.74rem; font-weight: 800; border-radius: 10px; --off: 3px; }
+/* short windows (laptops, browser zoom): tighten the result so it fits without scrolling */
+@media (max-height: 820px) {
+  .res { gap: 9px; }
+  .res-title { font-size: 2.1rem; }
+  .res-score b { font-size: 2.7rem; }
+  .stamp { padding: 5px 22px 7px; }
+  .stamp b { font-size: 1.15rem; }
+  .res-stats div { padding: 6px 4px; }
+  .res .btn3d.big { padding: 12px 22px; font-size: 1.15rem; }
+  .res-actions .btn3d { padding: 7px 6px 6px; }
+}
 .share-img-wrap { display: grid; place-items: center; margin-bottom: 12px; }
 .share-img, .share-img-ph { width: min(62%, 300px); aspect-ratio: 4 / 5; border-radius: 6px; box-shadow: 0 0 0 2px var(--navy), 5px 5px 0 2px var(--navy); -webkit-touch-callout: default; -webkit-user-select: auto; user-select: auto; }
 .share-img-ph { display: grid; place-items: center; background: var(--sunken); font-size: 0.8rem; font-weight: 800; color: var(--ink-dim); }
@@ -1195,15 +1207,15 @@ a.textbtn { text-decoration: underline; text-decoration-thickness: 2px; text-und
     if (!w || !h) return;
     let s, left, top;
     if (h >= w * 1.05) {
-      const reserve = isTouch() ? Math.min(230, h * 0.34) : 24;
+      const reserve = isTouch() ? Math.min(230, h * 0.34) : 40;   // keyboard: leave room for the key hint under the board
       s = Math.min(w - 20, h - reserve - 6);
       s = Math.max(160, Math.floor(s));
       left = (w - s) / 2; top = isTouch() ? 4 : (h - reserve - s) / 2 + 4;
     } else {
       const side = isTouch() ? Math.min(180, w * 0.2) : 0;
-      s = Math.min(h - 28, w - side * 2 - 16);
+      s = Math.min(h - (isTouch() ? 28 : 44), w - side * 2 - 16);
       s = Math.max(160, Math.floor(s));
-      left = (w - s) / 2; top = Math.max(4, (h - s) / 2 - 8);
+      left = (w - s) / 2; top = Math.max(4, (h - s) / 2 - (isTouch() ? 8 : 15));
     }
     board.style.width = board.style.height = s + 'px';
     board.style.left = Math.round(left) + 'px';
